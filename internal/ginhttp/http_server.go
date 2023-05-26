@@ -1,19 +1,18 @@
-package echohttp
+package ginhttp
 
 import (
 	"context"
+	"github.com/gin-gonic/gin"
 	"inventory-app-be/internal/service"
-
-	"github.com/labstack/echo/v4"
 )
 
 type Server struct {
-	router  *echo.Echo
+	router  *gin.Engine
 	service *service.Service
 }
 
 // NewServer ...
-func NewServer(router *echo.Echo, service *service.Service) *Server {
+func NewServer(router *gin.Engine, service *service.Service) *Server {
 	return &Server{
 		router:  router,
 		service: service,
@@ -21,8 +20,9 @@ func NewServer(router *echo.Echo, service *service.Service) *Server {
 }
 
 func (s *Server) Run(ctx context.Context) {
-	e := echo.New()
+
 	// e.HTTPErrorHandler = handleEchoError(cfg)
+	s.router.POST("/", s.Test)
 
 	// runtimeCfg := echokit.NewRuntimeConfig(cfg, "restapi")
 	//runtimeCfg.BuildInfo = service.Version
@@ -37,6 +37,9 @@ func (s *Server) Run(ctx context.Context) {
 
 	// run actual server
 	// echokit.RunServerWithContext(ctx, e, runtimeCfg)
-	e.Logger.Fatal(e.Start(":9070"))
 
+	err := s.router.Run(":9070")
+	if err != nil {
+		panic(err)
+	}
 }

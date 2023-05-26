@@ -1,6 +1,7 @@
 package config
 
 import (
+	"inventory-app-be/internal/models"
 	"log"
 	"os"
 
@@ -19,6 +20,10 @@ func LoadDB() *gorm.DB {
 		panic(err)
 	}
 
+	err = db.AutoMigrate(models.User{})
+	if err != nil {
+		panic(err.Error())
+	}
 	log.Printf("Success connecting to database")
 
 	return db

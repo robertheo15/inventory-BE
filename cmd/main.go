@@ -2,14 +2,13 @@ package main
 
 import (
 	"context"
+	"github.com/gin-gonic/gin"
 	"inventory-app-be/internal/config"
-	"inventory-app-be/internal/echohttp"
+	"inventory-app-be/internal/ginhttp"
 	repository "inventory-app-be/internal/repository/postgres/inventory"
 	service "inventory-app-be/internal/service"
 	"log"
 	"time"
-
-	"github.com/labstack/echo/v4"
 )
 
 func main() {
@@ -27,7 +26,7 @@ func main() {
 	svc := service.NewService(repo)
 
 	time.Local = locJakarta
-	e := echo.New()
+	g := gin.Default()
 
-	echohttp.NewServer(e, svc).Run(context.Background())
+	ginhttp.NewServer(g, svc).Run(context.Background())
 }
