@@ -1,17 +1,16 @@
 package config
 
 import (
-	"inventory-app-be/internal/models"
+	"database/sql"
 	"log"
 	"os"
 
 	_ "github.com/lib/pq"
-	"gorm.io/driver/postgres"
-	"gorm.io/gorm"
 )
 
-func LoadDB() *gorm.DB {
-	db, err := gorm.Open(postgres.Open(os.Getenv("DB_CONFIG_LOCAL")), &gorm.Config{})
+func LoadDB() *sql.DB {
+	// db, err := gorm.Open(postgres.Open(os.Getenv("DB_CONFIG_LOCAL")), &gorm.Config{})
+	db, err := sql.Open("postgres", os.Getenv("DB_CONFIG_LOCAL"))
 	if err != nil {
 		log.Fatal("Error connecting database")
 	}
@@ -20,10 +19,12 @@ func LoadDB() *gorm.DB {
 		panic(err)
 	}
 
-	err = db.AutoMigrate(models.User{})
+	// err = db.AutoMigrate(&models.User{})
+	err = db.Ping()
 	if err != nil {
 		panic(err.Error())
 	}
+
 	log.Printf("Success connecting to database")
 
 	return db

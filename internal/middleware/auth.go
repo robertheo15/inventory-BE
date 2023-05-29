@@ -1,10 +1,11 @@
 package middleware
 
 import (
-	"github.com/gin-gonic/gin"
-	"github.com/golang-jwt/jwt/v4"
 	"net/http"
 	"strings"
+
+	"github.com/gin-gonic/gin"
+	"github.com/golang-jwt/jwt/v4"
 )
 
 func Auth() gin.HandlerFunc {
@@ -24,6 +25,7 @@ func Auth() gin.HandlerFunc {
 				"error":   true,
 				"message": "UNAUTHORIZED",
 			})
+
 			return
 		}
 
@@ -35,8 +37,10 @@ func Auth() gin.HandlerFunc {
 				"error":   true,
 				"message": err.Error(),
 			})
+
 			return
 		}
+
 		data := verify.(jwt.MapClaims)
 
 		ctx.Set("id", data["id"])
