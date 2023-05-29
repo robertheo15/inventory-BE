@@ -1,13 +1,28 @@
 package ginhttp
 
 import (
-	"github.com/gin-gonic/gin"
+	"log"
 	"net/http"
+
+	"github.com/gin-gonic/gin"
 )
 
-func (s *Server) Test(ctx *gin.Context) {
-	//s.service
-	product := s.service.CreateProduct(ctx)
-	ctx.JSON(http.StatusOK, product)
+func (s *Server) CreateUser(ctx *gin.Context) {
+	// s.service
+	user, err := s.service.CreateUser(ctx)
+	if err != nil {
+		log.Fatal(err)
+	}
 
+	ctx.JSON(http.StatusOK, user)
+}
+
+func (s *Server) GetUserByID(ctx *gin.Context) {
+	// s.service
+	user, err := s.service.GetUserByID(ctx)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	ctx.JSON(http.StatusOK, user)
 }
