@@ -1,10 +1,11 @@
 package middleware
 
 import (
-	"fmt"
-	"github.com/golang-jwt/jwt/v4"
-	"golang.org/x/crypto/bcrypt"
 	"os"
+
+	"github.com/golang-jwt/jwt/v4"
+	"github.com/pkg/errors"
+	"golang.org/x/crypto/bcrypt"
 )
 
 var secretKey = os.Getenv("SECRET_KEY")
@@ -23,7 +24,7 @@ func GenerateToken(id uint, email string) string {
 func VerifyToken(tokenString string) (interface{}, error) {
 	token, err := jwt.Parse(tokenString, func(t *jwt.Token) (interface{}, error) {
 		if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, fmt.Errorf("unauthorized")
+			return nil, errors.New("unauthorized")
 		}
 
 		return []byte(secretKey), nil
@@ -34,7 +35,7 @@ func VerifyToken(tokenString string) (interface{}, error) {
 	}
 
 	if _, ok := token.Claims.(jwt.MapClaims); !ok && !token.Valid {
-		return nil, fmt.Errorf("unauthorized")
+		return nil, errors.Wrapf(err, "unauthorized")
 	}
 
 	return token.Claims.(jwt.MapClaims), nil
@@ -45,10 +46,12 @@ func HashPassword(password string) (string, error) {
 	if err != nil {
 		return "", err
 	}
+
 	return string(hash), err
 }
 
 func ComparePassword(dbPassword, userPassword string) bool {
 	err := bcrypt.CompareHashAndPassword([]byte(dbPassword), []byte(userPassword))
+
 	return err == nil
 }
