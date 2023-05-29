@@ -1,9 +1,9 @@
 package service
 
 import (
-	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
 	"inventory-app-be/internal/models"
+
+	"github.com/gin-gonic/gin"
 )
 
 func (s *Service) GetProducts(ctx *gin.Context) string {
@@ -12,11 +12,9 @@ func (s *Service) GetProducts(ctx *gin.Context) string {
 }
 
 func (s *Service) CreateProduct(ctx *gin.Context) *models.User {
-	user := &models.User{
-		ID:       uuid.New(),
-		FullName: "Robert",
-		Email:    "Robertheo@gmail.com"}
-
-	s.inventoryRepo.CreateProduct(user)
-	return user
+	// user, err := s.inventoryRepo.CreateProduct(ctx)
+	// if err != nil {
+	//	return nil
+	//}
+	return nil
 }
