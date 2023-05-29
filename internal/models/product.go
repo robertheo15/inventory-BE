@@ -1,8 +1,9 @@
 package models
 
 import (
-	"github.com/google/uuid"
 	"time"
+
+	"github.com/google/uuid"
 )
 
 type Product struct {
@@ -17,7 +18,7 @@ type Product struct {
 	Image       string    `json:"image"`
 	Type        string    `json:"type"`
 	PvID        string    `json:"pv_id"`
-	//Children    []*Product `json:"children"`
+	// Children    []*Product `json:"children"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
 	CreatedBy string    `json:"created_by"`

@@ -1,7 +1,6 @@
 package models
 
 import (
-	"github.com/google/uuid"
 	"time"
 )
 
@@ -12,7 +11,7 @@ var (
 )
 
 type User struct {
-	ID          uuid.UUID `json:"id"`
+	ID          string    `json:"id"`
 	FullName    string    `json:"full_name"`
 	Password    string    `json:"password"`
 	PhoneNumber string    `json:"phone_number"`
@@ -26,7 +25,7 @@ type User struct {
 }
 
 type Customer struct {
-	ID        string    `json:"c_id"`
+	ID        string    `json:"id"`
 	Name      string    `json:"full_name"`
 	Phone     string    `json:"phone_number"`
 	Address   string    `json:"address"`
