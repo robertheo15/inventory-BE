@@ -1,15 +1,16 @@
 package inventory
 
 import (
-	"gorm.io/gorm"
+	"database/sql"
+	"inventory-app-be/internal/repository/postgres/sqlc"
 )
 
 type PostgresInventoryRepository struct {
-	db *gorm.DB
+	db *sqlc.Queries
 }
 
-func NewPostgresInventoryRepository(db *gorm.DB) *PostgresInventoryRepository {
+func NewPostgresInventoryRepository(db *sql.DB) *PostgresInventoryRepository {
 	return &PostgresInventoryRepository{
-		db: db,
+		db: sqlc.New(db),
 	}
 }
