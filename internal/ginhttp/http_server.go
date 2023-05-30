@@ -24,6 +24,10 @@ func (s *Server) Run(ctx context.Context) {
 	s.router.POST("/users", s.CreateUser)
 	s.router.GET("/users", s.GetUserByID)
 
+	s.router.GET("/products", s.getProducts)
+	s.router.GET("/products/:productID", s.getProductByID)
+	s.router.PUT("/products/:productID", s.updateProductByID)
+	s.router.DELETE("/products/:productID", s.deleteProductByID)
 	// routes
 	// e.GET("/students", s.getStudents())
 	// e.GET("/students/:studentId", s.getStudentById())

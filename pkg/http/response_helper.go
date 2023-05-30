@@ -6,27 +6,26 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func BadRequestResponse(ctx *gin.Context, payload interface{}) {
-	WriteJSONResponse(ctx, http.StatusBadRequest, gin.H{
-		"error": true,
-		"data":  payload,
-	})
-}
+var (
+	Get     = "Data berhasil diambil"
+	Created = "Data berhasil ditambah"
+	Updated = "Data berhasil diubah"
+	Deleted = "Data berhasil dihapus"
+)
 
-func InternalServerJSONResponse(ctx *gin.Context, payload interface{}) {
-	WriteJSONResponse(ctx, http.StatusInternalServerError, gin.H{
-		"error": true,
-		"data":  payload,
-	})
-}
+//func setMessageHttp(data any, ) string {
+//	return fmt.Sprintf("%s", data)
+//}
 
-func NotFoundResponse(ctx *gin.Context, payload interface{}) {
-	WriteJSONResponse(ctx, http.StatusNotFound, gin.H{
-		"error": true,
-		"data":  payload,
-	})
-}
+func WriteJSONResponse(ctx *gin.Context, status int, payload interface{}, message interface{}) {
+	err := false
+	if status == http.StatusBadRequest {
+		err = true
+	}
 
-func WriteJSONResponse(ctx *gin.Context, status int, payload interface{}) {
-	ctx.JSON(status, payload)
+	ctx.JSON(status, gin.H{
+		"error":   err,
+		"data":    payload,
+		"message": message,
+	})
 }
