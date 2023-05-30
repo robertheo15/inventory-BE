@@ -8,6 +8,71 @@ import (
 	"database/sql"
 )
 
+type Customer struct {
+	ID          string         `json:"id"`
+	FullName    sql.NullString `json:"full_name"`
+	PhoneNumber sql.NullString `json:"phone_number"`
+	Address     sql.NullString `json:"address"`
+	CreatedAt   sql.NullTime   `json:"created_at"`
+	UpdatedAt   sql.NullTime   `json:"updated_at"`
+	CreatedBy   sql.NullString `json:"created_by"`
+	UpdatedBy   sql.NullString `json:"updated_by"`
+}
+
+type Product struct {
+	ID          string         `json:"id"`
+	ProductID   sql.NullString `json:"product_id"`
+	Name        sql.NullString `json:"name"`
+	Brand       sql.NullString `json:"brand"`
+	Description sql.NullString `json:"description"`
+	Stock       sql.NullInt32  `json:"stock"`
+	BasePrice   sql.NullString `json:"base_price"`
+	PriceEceran sql.NullString `json:"price_eceran"`
+	PriceGrosir sql.NullString `json:"price_grosir"`
+	Image       sql.NullString `json:"image"`
+	Type        sql.NullString `json:"type"`
+	CreatedAt   sql.NullTime   `json:"created_at"`
+	UpdatedAt   sql.NullTime   `json:"updated_at"`
+	CreatedBy   sql.NullString `json:"created_by"`
+	UpdatedBy   sql.NullString `json:"updated_by"`
+}
+
+type ProductVariant struct {
+	ID        string         `json:"id"`
+	PID       sql.NullString `json:"p_id"`
+	Name      sql.NullString `json:"name"`
+	Colour    sql.NullString `json:"colour"`
+	CreatedAt sql.NullTime   `json:"created_at"`
+	UpdatedAt sql.NullTime   `json:"updated_at"`
+	CreatedBy sql.NullString `json:"created_by"`
+	UpdatedBy sql.NullString `json:"updated_by"`
+}
+
+type Transaction struct {
+	ID            string         `json:"id"`
+	TransactionID sql.NullString `json:"transaction_id"`
+	Invoice       sql.NullString `json:"invoice"`
+	Status        sql.NullString `json:"status"`
+	Type          sql.NullString `json:"type"`
+	TotalPrice    sql.NullString `json:"total_price"`
+	CreatedAt     sql.NullTime   `json:"created_at"`
+	UpdatedAt     sql.NullTime   `json:"updated_at"`
+	CreatedBy     sql.NullString `json:"created_by"`
+	UpdatedBy     sql.NullString `json:"updated_by"`
+}
+
+type TransactionDetail struct {
+	ID        string         `json:"id"`
+	TID       sql.NullString `json:"t_id"`
+	PID       sql.NullString `json:"p_id"`
+	Price     sql.NullString `json:"price"`
+	Qty       sql.NullInt32  `json:"qty"`
+	CreatedAt sql.NullTime   `json:"created_at"`
+	UpdatedAt sql.NullTime   `json:"updated_at"`
+	CreatedBy sql.NullString `json:"created_by"`
+	UpdatedBy sql.NullString `json:"updated_by"`
+}
+
 type User struct {
 	ID          string         `json:"id"`
 	FullName    sql.NullString `json:"full_name"`

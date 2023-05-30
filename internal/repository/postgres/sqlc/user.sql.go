@@ -7,6 +7,7 @@ package sqlc
 
 import (
 	"context"
+	"time"
 )
 
 const createUser = `-- name: CreateUser :one
@@ -73,18 +74,30 @@ func (q *Queries) DeleteUserByID(ctx context.Context, id string) (string, error)
 }
 
 const getUserByID = `-- name: GetUserByID :one
-select id, full_name, password, phone_number, email, role, active, created_at, updated_at, created_by, updated_by
+select id::char(36), full_name::varchar, phone_number::varchar, email::varchar, role::varchar, active::boolean, created_at::timestamp, updated_at::timestamp, created_by::varchar, updated_by::varchar
 from users
 where id = $1::varchar
 `
 
-func (q *Queries) GetUserByID(ctx context.Context, id string) (User, error) {
+type GetUserByIDRow struct {
+	ID          string    `json:"id"`
+	FullName    string    `json:"full_name"`
+	PhoneNumber string    `json:"phone_number"`
+	Email       string    `json:"email"`
+	Role        string    `json:"role"`
+	Active      bool      `json:"active"`
+	CreatedAt   time.Time `json:"created_at"`
+	UpdatedAt   time.Time `json:"updated_at"`
+	CreatedBy   string    `json:"created_by"`
+	UpdatedBy   string    `json:"updated_by"`
+}
+
+func (q *Queries) GetUserByID(ctx context.Context, id string) (GetUserByIDRow, error) {
 	row := q.db.QueryRowContext(ctx, getUserByID, id)
-	var i User
+	var i GetUserByIDRow
 	err := row.Scan(
 		&i.ID,
 		&i.FullName,
-		&i.Password,
 		&i.PhoneNumber,
 		&i.Email,
 		&i.Role,
@@ -107,7 +120,7 @@ SET full_name = $1::varchar,
         active = $6::boolean,
         updated_at = (now() at time zone 'Asia/Jakarta'):: timestamp,
         updated_by = $7::varchar
-WHERE id = $8::char(36) returning id
+WHERE id = $8:: char (36) returning id
 `
 
 type UpdateUserByIDParams struct {
