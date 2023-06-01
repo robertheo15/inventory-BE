@@ -78,6 +78,7 @@ func (repo *PostgresInventoryRepository) GetProducts(ctx *gin.Context) ([]*model
 		}
 		products = append(products, newProduct)
 	}
+
 	return products, nil
 }
 

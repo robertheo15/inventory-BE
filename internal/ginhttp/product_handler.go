@@ -2,10 +2,11 @@ package ginhttp
 
 import (
 	"fmt"
-	valid "github.com/asaskevich/govalidator"
 	"inventory-app-be/internal/models"
 	pkgHttp "inventory-app-be/pkg/http"
 	"net/http"
+
+	valid "github.com/asaskevich/govalidator"
 
 	"github.com/gin-gonic/gin"
 )
@@ -35,6 +36,7 @@ func (s *Server) createProduct(ctx *gin.Context) {
 
 func (s *Server) getProducts(ctx *gin.Context) {
 	products, err := s.service.GetProducts(ctx)
+
 	if err != nil {
 		pkgHttp.WriteJSONResponse(ctx, http.StatusBadRequest, nil, err.Error())
 	} else {
@@ -54,7 +56,6 @@ func (s *Server) getProductByID(ctx *gin.Context) {
 }
 
 func (s *Server) updateProductByID(ctx *gin.Context) {
-
 	var newProduct *models.Product
 
 	err := ctx.ShouldBindJSON(&newProduct)
