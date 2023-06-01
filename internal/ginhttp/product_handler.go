@@ -1,6 +1,7 @@
 package ginhttp
 
 import (
+	"fmt"
 	valid "github.com/asaskevich/govalidator"
 	"inventory-app-be/internal/models"
 	pkgHttp "inventory-app-be/pkg/http"
@@ -10,6 +11,26 @@ import (
 )
 
 func (s *Server) createProduct(ctx *gin.Context) {
+	var newProduct *models.Product
+
+	err := ctx.ShouldBindJSON(&newProduct)
+	if err != nil {
+		pkgHttp.WriteJSONResponse(ctx, http.StatusBadRequest, nil, err.Error())
+		return
+	}
+
+	_, err = valid.ValidateStruct(newProduct)
+	if err != nil {
+		pkgHttp.WriteJSONResponse(ctx, http.StatusBadRequest, nil, err.Error())
+		return
+	}
+
+	product, err := s.service.CreateProduct(ctx, newProduct)
+	if err != nil {
+		pkgHttp.WriteJSONResponse(ctx, http.StatusBadRequest, nil, err.Error())
+	} else {
+		pkgHttp.WriteJSONResponse(ctx, http.StatusOK, product, pkgHttp.Created)
+	}
 }
 
 func (s *Server) getProducts(ctx *gin.Context) {
@@ -63,6 +84,7 @@ func (s *Server) deleteProductByID(ctx *gin.Context) {
 	if err != nil {
 		pkgHttp.WriteJSONResponse(ctx, http.StatusBadRequest, nil, err.Error())
 	} else {
-		pkgHttp.WriteJSONResponse(ctx, http.StatusOK, nil, pkgHttp.Deleted)
+		pkgHttp.WriteJSONResponse(ctx, http.StatusOK,
+			fmt.Sprintf("Product dengan id: %s berhasil dihapus", productID), pkgHttp.Deleted)
 	}
 }

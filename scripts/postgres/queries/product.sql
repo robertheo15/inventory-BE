@@ -35,13 +35,13 @@ SELECT id::char(36),
 FROM products
 WHERE id = @productID::char(36);
 
--- name: CreateProduct :exec
+-- name: CreateProduct :one
 INSERT INTO products (id, product_id, name, brand, description, stock, base_price,
                       price_eceran, price_grosir, image, type, created_at, updated_at, created_by, updated_by)
-VALUES ((gen_random_uuid()::char(36)), @productID::char(36), @name::varchar, @brand::varchar,
-        @description::varchar, @stock::integer, @basePrice::numeric,
-        @priceEceran::numeric, @priceGrosir::numeric, @image::varchar, @type::varchar,
-        now() at time zone 'Asia/Jakarta', now() at time zone 'Asia/Jakarta', @createdBy::varchar, @updatedBy::varchar);
+VALUES ((gen_random_uuid()::char(36)), @product_id::char(36), @name::varchar, @brand::varchar,
+        @description::varchar, @stock::integer, @base_price::float,
+        @price_eceran::float, @price_grosir::float, @image::varchar, @type::varchar,
+        now() at time zone 'Asia/Jakarta', now() at time zone 'Asia/Jakarta', @created_by::varchar, @updated_by::varchar) returning id;
 
 -- name: UpdateProductByID :one
 UPDATE products

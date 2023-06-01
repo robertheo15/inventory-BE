@@ -6,12 +6,13 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func (s *Service) CreateProduct(ctx *gin.Context) *models.User {
-	// user, err := s.inventoryRepo.CreateProduct(ctx)
-	// if err != nil {
-	//	return nil
-	//}
-	return nil
+func (s *Service) CreateProduct(ctx *gin.Context, newProduct *models.Product) (*models.Product, error) {
+	product, err := s.inventoryRepo.CreateProduct(ctx, newProduct)
+	if err != nil {
+		return nil, err
+	}
+
+	return product, nil
 }
 
 func (s *Service) GetProducts(ctx *gin.Context) ([]*models.Product, error) {

@@ -10,46 +10,48 @@ import (
 	"time"
 )
 
-const createProduct = `-- name: CreateProduct :exec
+const createProduct = `-- name: CreateProduct :one
 INSERT INTO products (id, product_id, name, brand, description, stock, base_price,
                       price_eceran, price_grosir, image, type, created_at, updated_at, created_by, updated_by)
 VALUES ((gen_random_uuid()::char(36)), $1::char(36), $2::varchar, $3::varchar,
-        $4::varchar, $5::integer, $6::numeric,
-        $7::numeric, $8::numeric, $9::varchar, $10::varchar,
-        now() at time zone 'Asia/Jakarta', now() at time zone 'Asia/Jakarta', $11::varchar, $12::varchar)
+        $4::varchar, $5::integer, $6::float,
+        $7::float, $8::float, $9::varchar, $10::varchar,
+        now() at time zone 'Asia/Jakarta', now() at time zone 'Asia/Jakarta', $11::varchar, $12::varchar) returning id
 `
 
 type CreateProductParams struct {
-	Productid   string `json:"productid"`
-	Name        string `json:"name"`
-	Brand       string `json:"brand"`
-	Description string `json:"description"`
-	Stock       int32  `json:"stock"`
-	Baseprice   string `json:"baseprice"`
-	Priceeceran string `json:"priceeceran"`
-	Pricegrosir string `json:"pricegrosir"`
-	Image       string `json:"image"`
-	Type        string `json:"type"`
-	Createdby   string `json:"createdby"`
-	Updatedby   string `json:"updatedby"`
+	ProductID   string  `json:"product_id"`
+	Name        string  `json:"name"`
+	Brand       string  `json:"brand"`
+	Description string  `json:"description"`
+	Stock       int32   `json:"stock"`
+	BasePrice   float64 `json:"base_price"`
+	PriceEceran float64 `json:"price_eceran"`
+	PriceGrosir float64 `json:"price_grosir"`
+	Image       string  `json:"image"`
+	Type        string  `json:"type"`
+	CreatedBy   string  `json:"created_by"`
+	UpdatedBy   string  `json:"updated_by"`
 }
 
-func (q *Queries) CreateProduct(ctx context.Context, arg CreateProductParams) error {
-	_, err := q.db.ExecContext(ctx, createProduct,
-		arg.Productid,
+func (q *Queries) CreateProduct(ctx context.Context, arg CreateProductParams) (string, error) {
+	row := q.db.QueryRowContext(ctx, createProduct,
+		arg.ProductID,
 		arg.Name,
 		arg.Brand,
 		arg.Description,
 		arg.Stock,
-		arg.Baseprice,
-		arg.Priceeceran,
-		arg.Pricegrosir,
+		arg.BasePrice,
+		arg.PriceEceran,
+		arg.PriceGrosir,
 		arg.Image,
 		arg.Type,
-		arg.Createdby,
-		arg.Updatedby,
+		arg.CreatedBy,
+		arg.UpdatedBy,
 	)
-	return err
+	var id string
+	err := row.Scan(&id)
+	return id, err
 }
 
 const deleteProductByID = `-- name: DeleteProductByID :one
