@@ -24,7 +24,8 @@ type Product struct {
 }
 
 type ProductVariant struct {
-	ID        string    `json:"pv_id"`
+	ID        string    `json:"id"`
+	ProductID string    `json:"p_id"`
 	Name      string    `json:"name"`
 	Colour    string    `json:"colour"`
 	CreatedAt time.Time `json:"created_at"`

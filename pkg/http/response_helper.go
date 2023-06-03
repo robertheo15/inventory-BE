@@ -13,10 +13,6 @@ var (
 	Deleted = "Data berhasil dihapus"
 )
 
-//func setMessageHttp(data any, ) string {
-//	return fmt.Sprintf("%s", data)
-//}
-
 func WriteJSONResponse(ctx *gin.Context, status int, payload interface{}, message interface{}) {
 	err := false
 	if status == http.StatusBadRequest {
