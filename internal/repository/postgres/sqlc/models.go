@@ -80,7 +80,7 @@ type User struct {
 	PhoneNumber sql.NullString `json:"phone_number"`
 	Email       sql.NullString `json:"email"`
 	Role        sql.NullInt32  `json:"role"`
-	Active      sql.NullBool   `json:"active"`
+	Active      sql.NullInt32  `json:"active"`
 	CreatedAt   sql.NullTime   `json:"created_at"`
 	UpdatedAt   sql.NullTime   `json:"updated_at"`
 	CreatedBy   sql.NullString `json:"created_by"`

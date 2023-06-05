@@ -11,15 +11,15 @@ import (
 )
 
 const createUser = `-- name: CreateUser :one
-INSERT INTO public.users (id, full_name, password, phone_number, email, role, active,
+INSERT INTO users (id, full_name, password, phone_number, email, role, active,
                           created_at, updated_at, created_by,
                           updated_by)
 VALUES ((gen_random_uuid()):: char (36), $1::varchar, $2::varchar, $3::varchar,
         $4::varchar,
         $5::integer,
-        $6::boolean, (now() at time zone 'Asia/Jakarta'):: timestamp,
+        $6::integer, (now() at time zone 'Asia/Jakarta'):: timestamp,
         (now() at time zone 'Asia/Jakarta'):: timestamp, $7::varchar,
-        $8::varchar) RETURNING id, full_name, password, phone_number, email, role, active, created_at, updated_at, created_by, updated_by
+        $8::varchar) RETURNING id::char(36)
 `
 
 type CreateUserParams struct {
@@ -28,12 +28,12 @@ type CreateUserParams struct {
 	PhoneNumber string `json:"phone_number"`
 	Email       string `json:"email"`
 	Role        int32  `json:"role"`
-	Active      bool   `json:"active"`
+	Active      int32  `json:"active"`
 	CreatedBy   string `json:"created_by"`
 	UpdatedBy   string `json:"updated_by"`
 }
 
-func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, error) {
+func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (string, error) {
 	row := q.db.QueryRowContext(ctx, createUser,
 		arg.FullName,
 		arg.Password,
@@ -44,7 +44,46 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 		arg.CreatedBy,
 		arg.UpdatedBy,
 	)
-	var i User
+	var id string
+	err := row.Scan(&id)
+	return id, err
+}
+
+const deleteUserByID = `-- name: DeleteUserByID :one
+DELETE
+FROM users
+WHERE id = $1::char(36) returning id
+`
+
+func (q *Queries) DeleteUserByID(ctx context.Context, id string) (string, error) {
+	row := q.db.QueryRowContext(ctx, deleteUserByID, id)
+	err := row.Scan(&id)
+	return id, err
+}
+
+const getUserByEmail = `-- name: GetUserByEmail :one
+SELECT id::char(36), full_name::varchar, password::varchar,phone_number::varchar, email::varchar, role::integer, active::integer, created_at::timestamp, updated_at::timestamp, created_by::varchar, updated_by::varchar
+FROM users
+WHERE email = $1::varchar
+`
+
+type GetUserByEmailRow struct {
+	ID          string    `json:"id"`
+	FullName    string    `json:"full_name"`
+	Password    string    `json:"password"`
+	PhoneNumber string    `json:"phone_number"`
+	Email       string    `json:"email"`
+	Role        int32     `json:"role"`
+	Active      int32     `json:"active"`
+	CreatedAt   time.Time `json:"created_at"`
+	UpdatedAt   time.Time `json:"updated_at"`
+	CreatedBy   string    `json:"created_by"`
+	UpdatedBy   string    `json:"updated_by"`
+}
+
+func (q *Queries) GetUserByEmail(ctx context.Context, email string) (GetUserByEmailRow, error) {
+	row := q.db.QueryRowContext(ctx, getUserByEmail, email)
+	var i GetUserByEmailRow
 	err := row.Scan(
 		&i.ID,
 		&i.FullName,
@@ -61,22 +100,10 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 	return i, err
 }
 
-const deleteUserByID = `-- name: DeleteUserByID :one
-DELETE
-FROM users
-WHERE id = $1::char(36) returning id
-`
-
-func (q *Queries) DeleteUserByID(ctx context.Context, id string) (string, error) {
-	row := q.db.QueryRowContext(ctx, deleteUserByID, id)
-	err := row.Scan(&id)
-	return id, err
-}
-
 const getUserByID = `-- name: GetUserByID :one
-select id::char(36), full_name::varchar, phone_number::varchar, email::varchar, role::varchar, active::boolean, created_at::timestamp, updated_at::timestamp, created_by::varchar, updated_by::varchar
-from users
-where id = $1::varchar
+SELECT id::char(36), full_name::varchar, phone_number::varchar, email::varchar, role::integer, active::integer, created_at::timestamp, updated_at::timestamp, created_by::varchar, updated_by::varchar
+FROM users
+WHERE id = $1::char(36)
 `
 
 type GetUserByIDRow struct {
@@ -84,8 +111,8 @@ type GetUserByIDRow struct {
 	FullName    string    `json:"full_name"`
 	PhoneNumber string    `json:"phone_number"`
 	Email       string    `json:"email"`
-	Role        string    `json:"role"`
-	Active      bool      `json:"active"`
+	Role        int32     `json:"role"`
+	Active      int32     `json:"active"`
 	CreatedAt   time.Time `json:"created_at"`
 	UpdatedAt   time.Time `json:"updated_at"`
 	CreatedBy   string    `json:"created_by"`
@@ -117,21 +144,25 @@ SET full_name = $1::varchar,
         phone_number = $3::varchar,
         email = $4::varchar,
         role = $5::integer,
-        active = $6::boolean,
+        active = $6::integer,
+        created_at = $7::timestamp,
         updated_at = (now() at time zone 'Asia/Jakarta'):: timestamp,
-        updated_by = $7::varchar
-WHERE id = $8:: char (36) returning id
+        created_by = $8::varchar,
+        updated_by = $9::varchar
+WHERE id = $10:: char (36) returning id
 `
 
 type UpdateUserByIDParams struct {
-	FullName    string `json:"full_name"`
-	Password    string `json:"password"`
-	PhoneNumber string `json:"phone_number"`
-	Email       string `json:"email"`
-	Role        int32  `json:"role"`
-	Active      bool   `json:"active"`
-	UpdatedBy   string `json:"updated_by"`
-	ID          string `json:"id"`
+	FullName    string    `json:"full_name"`
+	Password    string    `json:"password"`
+	PhoneNumber string    `json:"phone_number"`
+	Email       string    `json:"email"`
+	Role        int32     `json:"role"`
+	Active      int32     `json:"active"`
+	CreatedAt   time.Time `json:"created_at"`
+	CreatedBy   string    `json:"created_by"`
+	UpdatedBy   string    `json:"updated_by"`
+	ID          string    `json:"id"`
 }
 
 func (q *Queries) UpdateUserByID(ctx context.Context, arg UpdateUserByIDParams) (string, error) {
@@ -142,6 +173,8 @@ func (q *Queries) UpdateUserByID(ctx context.Context, arg UpdateUserByIDParams) 
 		arg.Email,
 		arg.Role,
 		arg.Active,
+		arg.CreatedAt,
+		arg.CreatedBy,
 		arg.UpdatedBy,
 		arg.ID,
 	)

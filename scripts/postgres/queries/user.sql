@@ -1,18 +1,23 @@
 -- name: CreateUser :one
-INSERT INTO public.users (id, full_name, password, phone_number, email, role, active,
+INSERT INTO users (id, full_name, password, phone_number, email, role, active,
                           created_at, updated_at, created_by,
                           updated_by)
 VALUES ((gen_random_uuid()):: char (36), @full_name::varchar, @password::varchar, @phone_number::varchar,
         @email::varchar,
         @role::integer,
-        @active::boolean, (now() at time zone 'Asia/Jakarta'):: timestamp,
+        @active::integer, (now() at time zone 'Asia/Jakarta'):: timestamp,
         (now() at time zone 'Asia/Jakarta'):: timestamp, @created_by::varchar,
-        @updated_by::varchar) RETURNING *;
+        @updated_by::varchar) RETURNING id::char(36);
 
 -- name: GetUserByID :one
-select *
-from users
-where id = @id::varchar;
+SELECT id::char(36), full_name::varchar, phone_number::varchar, email::varchar, role::integer, active::integer, created_at::timestamp, updated_at::timestamp, created_by::varchar, updated_by::varchar
+FROM users
+WHERE id = @id::char(36);
+
+-- name: GetUserByEmail :one
+SELECT id::char(36), full_name::varchar, password::varchar,phone_number::varchar, email::varchar, role::integer, active::integer, created_at::timestamp, updated_at::timestamp, created_by::varchar, updated_by::varchar
+FROM users
+WHERE email = @email::varchar;
 
 -- name: UpdateUserByID :one
 UPDATE users
@@ -21,10 +26,12 @@ SET full_name = @full_name::varchar,
         phone_number = @phone_number::varchar,
         email = @email::varchar,
         role = @role::integer,
-        active = @active::boolean,
+        active = @active::integer,
+        created_at = @created_at::timestamp,
         updated_at = (now() at time zone 'Asia/Jakarta'):: timestamp,
+        created_by = @created_by::varchar,
         updated_by = @updated_by::varchar
-WHERE id = @id::char(36) returning id;
+WHERE id = @id:: char (36) returning id;
 
 -- name: DeleteUserByID :one
 DELETE

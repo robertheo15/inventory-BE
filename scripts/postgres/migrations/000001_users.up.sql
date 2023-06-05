@@ -6,7 +6,7 @@ CREATE TABLE users
     phone_number varchar,
     email        varchar UNIQUE,
     role         integer,
-    active       boolean,
+    active       integer,
     created_at   timestamp,
     updated_at   timestamp,
     created_by   varchar,

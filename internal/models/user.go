@@ -13,11 +13,11 @@ var (
 type User struct {
 	ID          string    `json:"id"`
 	FullName    string    `json:"full_name"`
-	Password    string    `json:"password"`
+	Password    string    `validate:"required" json:"password"`
 	PhoneNumber string    `json:"phone_number"`
-	Email       string    `json:"email"`
-	Role        int       `json:"role"`
-	Active      bool      `json:"active"`
+	Email       string    `validate:"required,email" json:"email" `
+	Role        int32     `json:"role"`
+	Active      int32     `json:"active"`
 	CreatedAt   time.Time `json:"created_at"`
 	UpdatedAt   time.Time `json:"updated_at"`
 	CreatedBy   string    `json:"created_by"`
