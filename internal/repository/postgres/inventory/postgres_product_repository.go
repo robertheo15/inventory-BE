@@ -1,6 +1,7 @@
 package inventory
 
 import (
+	"fmt"
 	"inventory-app-be/internal/models"
 	"inventory-app-be/internal/repository/postgres/sqlc"
 	"log"
@@ -27,6 +28,8 @@ func (repo *PostgresInventoryRepository) CreateProduct(ctx *gin.Context, newProd
 
 	ID, err := repo.db.CreateProduct(ctx, product)
 	if err != nil {
+		log.Printf(fmt.Sprintf("Product Repository: %s", err))
+
 		return nil, err
 	}
 
@@ -56,7 +59,7 @@ func (repo *PostgresInventoryRepository) GetProducts(ctx *gin.Context) ([]*model
 
 	newProducts, err := repo.db.GetProducts(ctx)
 	if err != nil {
-		log.Printf("Product Repository: %s", err)
+		log.Println(fmt.Sprintf("Product Repository: %s", err))
 
 		return nil, err
 	}
@@ -88,6 +91,8 @@ func (repo *PostgresInventoryRepository) GetProducts(ctx *gin.Context) ([]*model
 func (repo *PostgresInventoryRepository) GetProductByID(ctx *gin.Context, id string) (*models.Product, error) {
 	product, err := repo.db.GetProductByID(ctx, id)
 	if err != nil {
+		log.Printf(fmt.Sprintf("Product Repository: %s", err))
+
 		return nil, err
 	}
 
@@ -129,7 +134,7 @@ func (repo *PostgresInventoryRepository) UpdateProductByID(ctx *gin.Context, new
 		Updatedby:   "system",
 	})
 	if err != nil {
-		log.Printf("Product Repository: %s", err)
+		log.Printf(fmt.Sprintf("Product Repository: %s", err))
 
 		return nil, err
 	}
@@ -158,7 +163,7 @@ func (repo *PostgresInventoryRepository) UpdateProductByID(ctx *gin.Context, new
 func (repo *PostgresInventoryRepository) DeleteProductByID(ctx *gin.Context, id string) (string, error) {
 	productID, err := repo.db.DeleteProductByID(ctx, id)
 	if err != nil {
-		log.Printf("Product Repository: %s", err)
+		log.Printf(fmt.Sprintf("Product Repository: %s", err))
 
 		return "", err
 	}
