@@ -3,16 +3,17 @@ package models
 import "time"
 
 type Transaction struct {
-	ID         string         `json:"transaction_id"`
-	Invoice    string         `json:"invoice"`
-	Status     string         `json:"status"`
-	Type       string         `json:"type"`
-	TotalPrice float64        `json:"total_price"`
-	Childs     *[]Transaction `json:"child"`
-	CreatedAt  time.Time      `json:"created_at"`
-	UpdatedAt  time.Time      `json:"updated_at"`
-	CreatedBy  string         `json:"created_by"`
-	UpdatedBy  string         `json:"updated_by"`
+	ID            string         `json:"id"`
+	TransactionID string         `json:"transaction_id"`
+	CID           string         `json:"c_id"`
+	Invoice       string         `json:"invoice"`
+	Status        string         `json:"status"`
+	Type          string         `json:"type"`
+	Children      []*Transaction `json:"children"`
+	CreatedAt     time.Time      `json:"created_at"`
+	UpdatedAt     time.Time      `json:"updated_at"`
+	CreatedBy     string         `json:"created_by"`
+	UpdatedBy     string         `json:"updated_by"`
 }
 
 type TransactionDetail struct {
