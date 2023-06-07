@@ -16,6 +16,7 @@ func Auth() gin.HandlerFunc {
 				"error":   true,
 				"message": "UNAUTHORIZED",
 			})
+
 			return
 		}
 
