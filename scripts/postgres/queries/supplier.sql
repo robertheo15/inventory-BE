@@ -50,7 +50,6 @@ SET brand_name = @brand_name::varchar,
     phone_number = @phone_number::varchar,
     address = @address::varchar,
     email = @email::varchar,
-    created_at = @created_at::timestamp,
     updated_at= now()::timestamp,
     created_by= @created_by::varchar,
     updated_by= @updated_by::varchar

@@ -22,16 +22,22 @@ WHERE email = @email::varchar;
 -- name: UpdateUserByID :one
 UPDATE users
 SET full_name = @full_name::varchar,
-        password = @password::varchar,
         phone_number = @phone_number::varchar,
         email = @email::varchar,
         role = @role::integer,
         active = @active::integer,
-        created_at = @created_at::timestamp,
         updated_at = (now() at time zone 'Asia/Jakarta'):: timestamp,
         created_by = @created_by::varchar,
         updated_by = @updated_by::varchar
 WHERE id = @id:: char (36) returning id;
+
+-- name: UpdatePasswordByID :one
+UPDATE users
+SET     password = @password::varchar,
+        updated_at = (now() at time zone 'Asia/Jakarta'):: timestamp,
+        created_by = @created_by::varchar,
+        updated_by = @updated_by::varchar
+WHERE id = @id:: char (36) returning id::char(36), created_at::timestamp;
 
 -- name: DeleteUserByID :one
 DELETE

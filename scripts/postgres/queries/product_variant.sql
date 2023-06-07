@@ -44,12 +44,11 @@ UPDATE product_variants SET
         p_id= @p_id::char(36),
         name= @name::varchar,
         colour= @colour::varchar,
-        created_at= @created_at::timestamp,
         updated_at= @updated_at::timestamp,
         created_by= @created_by::varchar,
         updated_by= @updated_by::varchar
-WHERE id = @id::char(36) RETURNING id::char(36), p_id::char(36), name::varchar, colour::varchar,created_at::timestamp,
-    updated_at::timestamp, created_by::varchar, updated_by::varchar;
+WHERE id = @id::char(36) RETURNING id::char(36), p_id::char(36), name::varchar, colour::varchar,
+    created_at::timestamp, updated_at::timestamp, created_by::varchar, updated_by::varchar;
 
 -- name: DeleteProductVariantByID :one
 DELETE

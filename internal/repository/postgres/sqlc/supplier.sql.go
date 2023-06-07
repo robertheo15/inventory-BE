@@ -173,11 +173,10 @@ SET brand_name = $1::varchar,
     phone_number = $2::varchar,
     address = $3::varchar,
     email = $4::varchar,
-    created_at = $5::timestamp,
     updated_at= now()::timestamp,
-    created_by= $6::varchar,
-    updated_by= $7::varchar
-WHERE id = $8::char(36) RETURNING
+    created_by= $5::varchar,
+    updated_by= $6::varchar
+WHERE id = $7::char(36) RETURNING
     id::char(36),
     brand_name::varchar,
     phone_number::varchar,
@@ -190,14 +189,13 @@ WHERE id = $8::char(36) RETURNING
 `
 
 type UpdateSupplierByIDParams struct {
-	BrandName   string    `json:"brand_name"`
-	PhoneNumber string    `json:"phone_number"`
-	Address     string    `json:"address"`
-	Email       string    `json:"email"`
-	CreatedAt   time.Time `json:"created_at"`
-	CreatedBy   string    `json:"created_by"`
-	UpdatedBy   string    `json:"updated_by"`
-	ID          string    `json:"id"`
+	BrandName   string `json:"brand_name"`
+	PhoneNumber string `json:"phone_number"`
+	Address     string `json:"address"`
+	Email       string `json:"email"`
+	CreatedBy   string `json:"created_by"`
+	UpdatedBy   string `json:"updated_by"`
+	ID          string `json:"id"`
 }
 
 type UpdateSupplierByIDRow struct {
@@ -218,7 +216,6 @@ func (q *Queries) UpdateSupplierByID(ctx context.Context, arg UpdateSupplierByID
 		arg.PhoneNumber,
 		arg.Address,
 		arg.Email,
-		arg.CreatedAt,
 		arg.CreatedBy,
 		arg.UpdatedBy,
 		arg.ID,

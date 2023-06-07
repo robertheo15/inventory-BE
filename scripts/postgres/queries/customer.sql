@@ -40,7 +40,6 @@ SET full_name = @full_name::varchar,
     address = @address::varchar,
     created_at = @created_at::timestamp,
     updated_at = (now() at time zone 'Asia/Jakarta')::timestamp,
-    created_by = @created_by::varchar,
     updated_by = @updated_by::varchar
 WHERE   id = @id::char(36) RETURNING
     id::char(36),

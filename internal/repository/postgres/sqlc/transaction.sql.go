@@ -186,11 +186,10 @@ SET c_id = $1::char(36),
     invoice = $3::varchar,
     status = $4::varchar,
     type = $5::varchar,
-    created_at = $6::timestamp,
     updated_at = (now() at time zone 'Asia/Jakarta')::timestamp,
-    created_by = $7::varchar,
-    updated_by = $8::varchar
-WHERE id = $9::char(36) RETURNING
+    created_by = $6::varchar,
+    updated_by = $7::varchar
+WHERE id = $8::char(36) RETURNING
     id::char(36),
     c_id::char(36),
     transaction_id::char(36),
@@ -204,15 +203,14 @@ WHERE id = $9::char(36) RETURNING
 `
 
 type UpdateTransactionByIDParams struct {
-	CID           string    `json:"c_id"`
-	TransactionID string    `json:"transaction_id"`
-	Invoice       string    `json:"invoice"`
-	Status        string    `json:"status"`
-	Type          string    `json:"type"`
-	CreatedAt     time.Time `json:"created_at"`
-	CreatedBy     string    `json:"created_by"`
-	UpdatedBy     string    `json:"updated_by"`
-	ID            string    `json:"id"`
+	CID           string `json:"c_id"`
+	TransactionID string `json:"transaction_id"`
+	Invoice       string `json:"invoice"`
+	Status        string `json:"status"`
+	Type          string `json:"type"`
+	CreatedBy     string `json:"created_by"`
+	UpdatedBy     string `json:"updated_by"`
+	ID            string `json:"id"`
 }
 
 type UpdateTransactionByIDRow struct {
@@ -235,7 +233,6 @@ func (q *Queries) UpdateTransactionByID(ctx context.Context, arg UpdateTransacti
 		arg.Invoice,
 		arg.Status,
 		arg.Type,
-		arg.CreatedAt,
 		arg.CreatedBy,
 		arg.UpdatedBy,
 		arg.ID,

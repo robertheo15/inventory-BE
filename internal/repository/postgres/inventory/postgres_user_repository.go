@@ -87,20 +87,19 @@ func (repo *PostgresInventoryRepository) GetUserByEmail(ctx *gin.Context, email 
 
 func (repo *PostgresInventoryRepository) UpdateUserByID(ctx *gin.Context, newUser *models.User) (*models.User, error) {
 	userSqlcUpdateParams := sqlc.UpdateUserByIDParams{
+		ID:          newUser.ID,
 		FullName:    newUser.FullName,
-		Password:    newUser.Password,
 		PhoneNumber: newUser.PhoneNumber,
 		Email:       newUser.Email,
 		Role:        newUser.Role,
 		Active:      newUser.Active,
-		CreatedAt:   newUser.CreatedAt,
 		CreatedBy:   newUser.CreatedBy,
 		UpdatedBy:   newUser.UpdatedBy,
 	}
 
 	userID, err := repo.db.UpdateUserByID(ctx, userSqlcUpdateParams)
 	if err != nil {
-		log.Printf("Get user by id repository error: %s", err)
+		log.Printf("User repository update user by id: %s", err)
 
 		return nil, err
 	}
@@ -124,12 +123,10 @@ func (repo *PostgresInventoryRepository) UpdateUserByID(ctx *gin.Context, newUse
 func (repo *PostgresInventoryRepository) DeActiveUserByID(ctx *gin.Context, newUser *models.User) (*models.User, error) {
 	userSqlcUpdateParams := sqlc.UpdateUserByIDParams{
 		FullName:    newUser.FullName,
-		Password:    newUser.Password,
 		PhoneNumber: newUser.PhoneNumber,
 		Email:       newUser.Email,
 		Role:        newUser.Role,
 		Active:      0,
-		CreatedAt:   newUser.CreatedAt,
 		CreatedBy:   newUser.CreatedBy,
 		UpdatedBy:   newUser.UpdatedBy,
 	}

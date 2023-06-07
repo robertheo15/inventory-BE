@@ -207,19 +207,17 @@ UPDATE product_variants SET
         p_id= $1::char(36),
         name= $2::varchar,
         colour= $3::varchar,
-        created_at= $4::timestamp,
-        updated_at= $5::timestamp,
-        created_by= $6::varchar,
-        updated_by= $7::varchar
-WHERE id = $8::char(36) RETURNING id::char(36), p_id::char(36), name::varchar, colour::varchar,created_at::timestamp,
-    updated_at::timestamp, created_by::varchar, updated_by::varchar
+        updated_at= $4::timestamp,
+        created_by= $5::varchar,
+        updated_by= $6::varchar
+WHERE id = $7::char(36) RETURNING id::char(36), p_id::char(36), name::varchar, colour::varchar,
+    created_at::timestamp, updated_at::timestamp, created_by::varchar, updated_by::varchar
 `
 
 type UpdateProductVariantByIDParams struct {
 	PID       string    `json:"p_id"`
 	Name      string    `json:"name"`
 	Colour    string    `json:"colour"`
-	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
 	CreatedBy string    `json:"created_by"`
 	UpdatedBy string    `json:"updated_by"`
@@ -242,7 +240,6 @@ func (q *Queries) UpdateProductVariantByID(ctx context.Context, arg UpdateProduc
 		arg.PID,
 		arg.Name,
 		arg.Colour,
-		arg.CreatedAt,
 		arg.UpdatedAt,
 		arg.CreatedBy,
 		arg.UpdatedBy,

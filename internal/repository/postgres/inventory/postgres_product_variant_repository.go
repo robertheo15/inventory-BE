@@ -121,7 +121,6 @@ func (repo *PostgresInventoryRepository) UpdateProductVariantByID(ctx *gin.Conte
 		PID:       newPVariant.ProductID,
 		Name:      newPVariant.Name,
 		Colour:    newPVariant.Colour,
-		CreatedAt: newPVariant.CreatedAt,
 		CreatedBy: newPVariant.CreatedBy,
 		UpdatedAt: newPVariant.UpdatedAt,
 		UpdatedBy: newPVariant.UpdatedBy,

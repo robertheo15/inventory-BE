@@ -55,7 +55,6 @@ SET c_id = @c_id::char(36),
     invoice = @invoice::varchar,
     status = @status::varchar,
     type = @type::varchar,
-    created_at = @created_at::timestamp,
     updated_at = (now() at time zone 'Asia/Jakarta')::timestamp,
     created_by = @created_by::varchar,
     updated_by = @updated_by::varchar

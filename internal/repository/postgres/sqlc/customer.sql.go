@@ -157,9 +157,8 @@ SET full_name = $1::varchar,
     address = $3::varchar,
     created_at = $4::timestamp,
     updated_at = (now() at time zone 'Asia/Jakarta')::timestamp,
-    created_by = $5::varchar,
-    updated_by = $6::varchar
-WHERE   id = $7::char(36) RETURNING
+    updated_by = $5::varchar
+WHERE   id = $6::char(36) RETURNING
     id::char(36),
     full_name::varchar,
     phone_number::varchar,
@@ -175,7 +174,6 @@ type UpdateCustomerByIDParams struct {
 	PhoneNumber string    `json:"phone_number"`
 	Address     string    `json:"address"`
 	CreatedAt   time.Time `json:"created_at"`
-	CreatedBy   string    `json:"created_by"`
 	UpdatedBy   string    `json:"updated_by"`
 	ID          string    `json:"id"`
 }
@@ -197,7 +195,6 @@ func (q *Queries) UpdateCustomerByID(ctx context.Context, arg UpdateCustomerByID
 		arg.PhoneNumber,
 		arg.Address,
 		arg.CreatedAt,
-		arg.CreatedBy,
 		arg.UpdatedBy,
 		arg.ID,
 	)

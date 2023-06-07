@@ -108,7 +108,6 @@ func (repo *PostgresInventoryRepository) UpdateTransactionByID(ctx *gin.Context,
 		Invoice:       newTransaction.Invoice,
 		Status:        newTransaction.Status,
 		Type:          newTransaction.Type,
-		CreatedAt:     newTransaction.CreatedAt,
 		CreatedBy:     newTransaction.CreatedBy,
 		UpdatedBy:     newTransaction.UpdatedBy,
 	}

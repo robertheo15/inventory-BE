@@ -98,7 +98,6 @@ func (repo *PostgresInventoryRepository) UpdateSupplierByID(ctx *gin.Context,
 		PhoneNumber: newSupplier.Phone,
 		Email:       newSupplier.Email,
 		Address:     newSupplier.Address,
-		CreatedAt:   newSupplier.CreatedAt,
 		UpdatedBy:   newSupplier.UpdatedBy,
 	})
 	if err != nil {

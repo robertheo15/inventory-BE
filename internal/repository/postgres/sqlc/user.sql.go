@@ -137,43 +137,70 @@ func (q *Queries) GetUserByID(ctx context.Context, id string) (GetUserByIDRow, e
 	return i, err
 }
 
+const updatePasswordByID = `-- name: UpdatePasswordByID :one
+UPDATE users
+SET     password = $1::varchar,
+        updated_at = (now() at time zone 'Asia/Jakarta'):: timestamp,
+        created_by = $2::varchar,
+        updated_by = $3::varchar
+WHERE id = $4:: char (36) returning id::char(36), created_at::timestamp
+`
+
+type UpdatePasswordByIDParams struct {
+	Password  string `json:"password"`
+	CreatedBy string `json:"created_by"`
+	UpdatedBy string `json:"updated_by"`
+	ID        string `json:"id"`
+}
+
+type UpdatePasswordByIDRow struct {
+	ID        string    `json:"id"`
+	CreatedAt time.Time `json:"created_at"`
+}
+
+func (q *Queries) UpdatePasswordByID(ctx context.Context, arg UpdatePasswordByIDParams) (UpdatePasswordByIDRow, error) {
+	row := q.db.QueryRowContext(ctx, updatePasswordByID,
+		arg.Password,
+		arg.CreatedBy,
+		arg.UpdatedBy,
+		arg.ID,
+	)
+	var i UpdatePasswordByIDRow
+	err := row.Scan(&i.ID, &i.CreatedAt)
+	return i, err
+}
+
 const updateUserByID = `-- name: UpdateUserByID :one
 UPDATE users
 SET full_name = $1::varchar,
-        password = $2::varchar,
-        phone_number = $3::varchar,
-        email = $4::varchar,
-        role = $5::integer,
-        active = $6::integer,
-        created_at = $7::timestamp,
+        phone_number = $2::varchar,
+        email = $3::varchar,
+        role = $4::integer,
+        active = $5::integer,
         updated_at = (now() at time zone 'Asia/Jakarta'):: timestamp,
-        created_by = $8::varchar,
-        updated_by = $9::varchar
-WHERE id = $10:: char (36) returning id
+        created_by = $6::varchar,
+        updated_by = $7::varchar
+WHERE id = $8:: char (36) returning id
 `
 
 type UpdateUserByIDParams struct {
-	FullName    string    `json:"full_name"`
-	Password    string    `json:"password"`
-	PhoneNumber string    `json:"phone_number"`
-	Email       string    `json:"email"`
-	Role        int32     `json:"role"`
-	Active      int32     `json:"active"`
-	CreatedAt   time.Time `json:"created_at"`
-	CreatedBy   string    `json:"created_by"`
-	UpdatedBy   string    `json:"updated_by"`
-	ID          string    `json:"id"`
+	FullName    string `json:"full_name"`
+	PhoneNumber string `json:"phone_number"`
+	Email       string `json:"email"`
+	Role        int32  `json:"role"`
+	Active      int32  `json:"active"`
+	CreatedBy   string `json:"created_by"`
+	UpdatedBy   string `json:"updated_by"`
+	ID          string `json:"id"`
 }
 
 func (q *Queries) UpdateUserByID(ctx context.Context, arg UpdateUserByIDParams) (string, error) {
 	row := q.db.QueryRowContext(ctx, updateUserByID,
 		arg.FullName,
-		arg.Password,
 		arg.PhoneNumber,
 		arg.Email,
 		arg.Role,
 		arg.Active,
-		arg.CreatedAt,
 		arg.CreatedBy,
 		arg.UpdatedBy,
 		arg.ID,
