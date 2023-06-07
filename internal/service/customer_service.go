@@ -1,8 +1,9 @@
 package service
 
 import (
-	"github.com/gin-gonic/gin"
 	"inventory-app-be/internal/models"
+
+	"github.com/gin-gonic/gin"
 )
 
 func (s *Service) CreateCustomer(ctx *gin.Context, newCustomer *models.Customer) (*models.Customer, error) {
@@ -44,7 +45,7 @@ func (s *Service) UpdateCustomerByID(ctx *gin.Context, newCustomer *models.Custo
 func (s *Service) DeleteCustomerByID(ctx *gin.Context, id string) (string, error) {
 	customerID, err := s.inventoryRepo.DeleteCustomerByID(ctx, id)
 	if err != nil {
-		return "nil", err
+		return "", err
 	}
 
 	return customerID, nil

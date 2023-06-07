@@ -45,7 +45,7 @@ func (s *Service) UpdateProductByID(ctx *gin.Context, newProduct *models.Product
 func (s *Service) DeleteProductByID(ctx *gin.Context, id string) (string, error) {
 	productID, err := s.inventoryRepo.DeleteProductByID(ctx, id)
 	if err != nil {
-		return "nil", err
+		return "", err
 	}
 
 	return productID, nil

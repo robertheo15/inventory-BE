@@ -54,7 +54,7 @@ func (s *Service) UpdateProductVariantByID(ctx *gin.Context, newProductVariant *
 func (s *Service) DeleteProductVariantByID(ctx *gin.Context, id string) (string, error) {
 	productID, err := s.inventoryRepo.DeleteProductVariantByID(ctx, id)
 	if err != nil {
-		return "nil", err
+		return "", err
 	}
 
 	return productID, nil
