@@ -1,6 +1,8 @@
 CREATE TABLE products
 (
     id           char(36) PRIMARY KEY,
+    s_id         char(36)
+        references suppliers,
     product_id   char(36),
     name         varchar,
     brand        varchar,
