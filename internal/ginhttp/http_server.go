@@ -21,8 +21,36 @@ func NewServer(router *gin.Engine, service *service.Service) *Server {
 }
 
 func (s *Server) Run(ctx context.Context) {
-	s.router.POST("/users", s.CreateUser)
-	s.router.GET("/users", s.GetUserByID)
+	s.router.POST("/login", s.login)
+
+	// s.router.Use(middleware.Auth())
+	//{
+	// s.router.PUT("/users/:userID", s.createUser)
+
+	//}
+	s.router.POST("/users", s.createUser)
+	s.router.GET("/users/details", s.getUserDetailByToken)
+
+	// customers
+	s.router.POST("/customers", s.createCustomer)
+	s.router.GET("/customers", s.getCustomers)
+	s.router.GET("/customers/:customerID", s.getCustomerByID)
+	s.router.PUT("/customers/:customerID", s.updateCustomerByID)
+	s.router.DELETE("/customers/:customerID", s.deleteCustomerByID)
+
+	// customers
+	s.router.POST("/transactions", s.createTransaction)
+	s.router.GET("/transactions", s.getTransactions)
+	s.router.GET("/transactions/:transactionID", s.getTransactionByID)
+	s.router.PUT("/transactions/:transactionID", s.updateTransactionByID)
+	s.router.DELETE("/transactions/:transactionID", s.deleteTransactionByID)
+
+	// suppliers
+	s.router.POST("/suppliers", s.createSupplier)
+	s.router.GET("/suppliers", s.getSuppliers)
+	s.router.GET("/suppliers/:supplierID", s.getSupplierByID)
+	s.router.PUT("/suppliers/:supplierID", s.updateSupplierByID)
+	s.router.DELETE("/suppliers/:supplierID", s.deleteSupplierByID)
 
 	// products
 	s.router.GET("/products", s.getProducts)
