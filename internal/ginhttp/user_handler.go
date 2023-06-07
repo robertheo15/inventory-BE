@@ -1,6 +1,7 @@
 package ginhttp
 
 import (
+	"fmt"
 	"github.com/go-playground/validator/v10"
 	"inventory-app-be/internal/models"
 	pkgHttp "inventory-app-be/pkg/http"
@@ -86,16 +87,22 @@ func (s *Server) updateUserByID(ctx *gin.Context) {
 		return
 	}
 
-	//_, err = valid.ValidateStruct(newUser)
-	//if err != nil {
-	//	pkgHttp.WriteJSONResponse(ctx, http.StatusBadRequest, nil, err.Error())
-	//	return
-	//}
-
 	user, err := s.service.UpdateUserByID(ctx, newUser)
 	if err != nil {
 		pkgHttp.WriteJSONResponse(ctx, http.StatusBadRequest, nil, err.Error())
 	} else {
 		pkgHttp.WriteJSONResponse(ctx, http.StatusOK, user, pkgHttp.Updated)
+	}
+}
+
+func (s *Server) deleteUserByID(ctx *gin.Context) {
+	userID := ctx.Param("userID")
+
+	productID, err := s.service.DeleteUserByID(ctx, userID)
+	if err != nil {
+		pkgHttp.WriteJSONResponse(ctx, http.StatusBadRequest, nil, err.Error())
+	} else {
+		pkgHttp.WriteJSONResponse(ctx, http.StatusOK,
+			fmt.Sprintf("User dengan id: %s berhasil dihapus", productID), pkgHttp.Deleted)
 	}
 }

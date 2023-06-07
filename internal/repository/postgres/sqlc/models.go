@@ -21,6 +21,7 @@ type Customer struct {
 
 type Product struct {
 	ID          string         `json:"id"`
+	SID         sql.NullString `json:"s_id"`
 	ProductID   sql.NullString `json:"product_id"`
 	Name        sql.NullString `json:"name"`
 	Brand       sql.NullString `json:"brand"`
@@ -48,13 +49,25 @@ type ProductVariant struct {
 	UpdatedBy sql.NullString `json:"updated_by"`
 }
 
+type Supplier struct {
+	ID          string         `json:"id"`
+	BrandName   sql.NullString `json:"brand_name"`
+	PhoneNumber sql.NullString `json:"phone_number"`
+	Address     sql.NullString `json:"address"`
+	Email       sql.NullString `json:"email"`
+	CreatedAt   sql.NullTime   `json:"created_at"`
+	UpdatedAt   sql.NullTime   `json:"updated_at"`
+	CreatedBy   sql.NullString `json:"created_by"`
+	UpdatedBy   sql.NullString `json:"updated_by"`
+}
+
 type Transaction struct {
 	ID            string         `json:"id"`
 	TransactionID sql.NullString `json:"transaction_id"`
+	CID           sql.NullString `json:"c_id"`
 	Invoice       sql.NullString `json:"invoice"`
 	Status        sql.NullString `json:"status"`
 	Type          sql.NullString `json:"type"`
-	TotalPrice    sql.NullString `json:"total_price"`
 	CreatedAt     sql.NullTime   `json:"created_at"`
 	UpdatedAt     sql.NullTime   `json:"updated_at"`
 	CreatedBy     sql.NullString `json:"created_by"`

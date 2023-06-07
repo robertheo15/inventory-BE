@@ -26,8 +26,20 @@ type User struct {
 
 type Customer struct {
 	ID        string    `json:"id"`
-	Name      string    `json:"full_name"`
+	FullName  string    `json:"full_name"`
 	Phone     string    `json:"phone_number"`
+	Address   string    `json:"address"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
+	CreatedBy string    `json:"created_by"`
+	UpdatedBy string    `json:"updated_by"`
+}
+
+type Supplier struct {
+	ID        string    `json:"id"`
+	BrandName string    `json:"brand_name"`
+	Phone     string    `json:"phone_number"`
+	Email     string    `json:"email"`
 	Address   string    `json:"address"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`

@@ -77,7 +77,7 @@ func (s *Service) DeActiveUserByID(ctx *gin.Context, newUser *models.User) (*mod
 	return user, nil
 }
 
-func (s *Service) DeletUserByID(ctx *gin.Context, id string) (string, error) {
+func (s *Service) DeleteUserByID(ctx *gin.Context, id string) (string, error) {
 	productID, err := s.inventoryRepo.DeleteUserByID(ctx, id)
 	if err != nil {
 		return "nil", err
