@@ -2,10 +2,11 @@ package ginhttp
 
 import (
 	"fmt"
-	"github.com/go-playground/validator/v10"
 	"inventory-app-be/internal/models"
 	pkgHttp "inventory-app-be/pkg/http"
 	"net/http"
+
+	"github.com/go-playground/validator/v10"
 
 	"github.com/gin-gonic/gin"
 )

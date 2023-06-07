@@ -2,11 +2,12 @@ package service
 
 import (
 	"errors"
-	"github.com/gin-gonic/gin"
-	"github.com/golang-jwt/jwt/v4"
 	"inventory-app-be/internal/middleware"
 	"inventory-app-be/internal/models"
 	"strings"
+
+	"github.com/gin-gonic/gin"
+	"github.com/golang-jwt/jwt/v4"
 )
 
 func (s *Service) CreateUser(ctx *gin.Context, newUser *models.User) (*models.User, error) {
@@ -44,6 +45,7 @@ func (s *Service) GetUserByEmail(ctx *gin.Context, loginUser *models.User) (stri
 	if !comparePass {
 		return "", errors.New("username / password is not match")
 	}
+
 	token := middleware.GenerateToken(user)
 
 	return token, nil
@@ -60,6 +62,7 @@ func (s *Service) UpdateUserByID(ctx *gin.Context, newUser *models.User) (*model
 
 func (s *Service) GetUserDetail(token string) (interface{}, error) {
 	bearerToken := strings.Split(token, "Bearer ")[1]
+
 	user, err := middleware.VerifyToken(bearerToken)
 	if err != nil {
 		return nil, err
@@ -80,7 +83,7 @@ func (s *Service) DeActiveUserByID(ctx *gin.Context, newUser *models.User) (*mod
 func (s *Service) DeleteUserByID(ctx *gin.Context, id string) (string, error) {
 	productID, err := s.inventoryRepo.DeleteUserByID(ctx, id)
 	if err != nil {
-		return "nil", err
+		return "", err
 	}
 
 	return productID, nil

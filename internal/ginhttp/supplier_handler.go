@@ -2,10 +2,11 @@ package ginhttp
 
 import (
 	"fmt"
-	"github.com/gin-gonic/gin"
 	"inventory-app-be/internal/models"
 	pkgHttp "inventory-app-be/pkg/http"
 	"net/http"
+
+	"github.com/gin-gonic/gin"
 )
 
 func (s *Server) createSupplier(ctx *gin.Context) {

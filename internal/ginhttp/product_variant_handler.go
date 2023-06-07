@@ -6,7 +6,6 @@ import (
 	pkgHttp "inventory-app-be/pkg/http"
 	"net/http"
 
-	valid "github.com/asaskevich/govalidator"
 	"github.com/gin-gonic/gin"
 )
 
@@ -14,12 +13,6 @@ func (s *Server) createProductVariant(ctx *gin.Context) {
 	var newProductVariant *models.ProductVariant
 
 	err := ctx.ShouldBindJSON(&newProductVariant)
-	if err != nil {
-		pkgHttp.WriteJSONResponse(ctx, http.StatusBadRequest, nil, err.Error())
-		return
-	}
-
-	_, err = valid.ValidateStruct(newProductVariant)
 	if err != nil {
 		pkgHttp.WriteJSONResponse(ctx, http.StatusBadRequest, nil, err.Error())
 		return
@@ -69,12 +62,6 @@ func (s *Server) updateProductVariantByID(ctx *gin.Context) {
 	var newProductVariant *models.ProductVariant
 
 	err := ctx.ShouldBindJSON(&newProductVariant)
-	if err != nil {
-		pkgHttp.WriteJSONResponse(ctx, http.StatusBadRequest, nil, err.Error())
-		return
-	}
-
-	_, err = valid.ValidateStruct(newProductVariant)
 	if err != nil {
 		pkgHttp.WriteJSONResponse(ctx, http.StatusBadRequest, nil, err.Error())
 		return

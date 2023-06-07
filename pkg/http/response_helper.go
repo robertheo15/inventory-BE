@@ -15,7 +15,7 @@ var (
 
 func WriteJSONResponse(ctx *gin.Context, status int, payload interface{}, message interface{}) {
 	err := false
-	if status == http.StatusBadRequest {
+	if status == http.StatusBadRequest || status == http.StatusUnauthorized {
 		err = true
 	}
 
