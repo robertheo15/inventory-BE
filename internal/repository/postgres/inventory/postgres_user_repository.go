@@ -1,7 +1,6 @@
 package inventory
 
 import (
-	"fmt"
 	"inventory-app-be/internal/models"
 	"inventory-app-be/internal/repository/postgres/sqlc"
 	"log"
@@ -48,7 +47,7 @@ func (repo *PostgresInventoryRepository) CreateUser(ctx *gin.Context, newUser *m
 func (repo *PostgresInventoryRepository) GetUserByID(ctx *gin.Context, id string) (*models.User, error) {
 	user, err := repo.db.GetUserByID(ctx, id)
 	if err != nil {
-		log.Printf(fmt.Sprintf("Get user by id repository error: %s", err))
+		log.Printf("Get user by id repository error: %s", err)
 
 		return nil, err
 	}
@@ -64,7 +63,7 @@ func (repo *PostgresInventoryRepository) GetUserByID(ctx *gin.Context, id string
 func (repo *PostgresInventoryRepository) GetUserByEmail(ctx *gin.Context, email string) (*models.User, error) {
 	user, err := repo.db.GetUserByEmail(ctx, email)
 	if err != nil {
-		log.Println(fmt.Sprintf("Get user by id repository error: %s", err))
+		log.Printf("Get user by id repository error: %s", err)
 
 		return nil, err
 	}
@@ -101,7 +100,7 @@ func (repo *PostgresInventoryRepository) UpdateUserByID(ctx *gin.Context, newUse
 
 	userID, err := repo.db.UpdateUserByID(ctx, userSqlcUpdateParams)
 	if err != nil {
-		log.Println(fmt.Sprintf("Get user by id repository error: %s", err))
+		log.Printf("Get user by id repository error: %s", err)
 
 		return nil, err
 	}
@@ -118,6 +117,7 @@ func (repo *PostgresInventoryRepository) UpdateUserByID(ctx *gin.Context, newUse
 		CreatedBy:   newUser.CreatedBy,
 		UpdatedBy:   newUser.UpdatedBy,
 	}
+
 	return resultNewUser, nil
 }
 
@@ -136,7 +136,7 @@ func (repo *PostgresInventoryRepository) DeActiveUserByID(ctx *gin.Context, newU
 
 	userID, err := repo.db.UpdateUserByID(ctx, userSqlcUpdateParams)
 	if err != nil {
-		log.Println(fmt.Sprintf("Get user by id repository error: %s", err))
+		log.Printf("Get user by id repository error: %s", err)
 
 		return nil, err
 	}
@@ -153,13 +153,14 @@ func (repo *PostgresInventoryRepository) DeActiveUserByID(ctx *gin.Context, newU
 		CreatedBy:   newUser.CreatedBy,
 		UpdatedBy:   newUser.UpdatedBy,
 	}
+
 	return resultNewUser, nil
 }
 
 func (repo *PostgresInventoryRepository) DeleteUserByID(ctx *gin.Context, id string) (string, error) {
 	userID, err := repo.db.DeleteUserByID(ctx, id)
 	if err != nil {
-		log.Println(fmt.Sprintf("Product Repository: %s", err))
+		log.Printf("Product Repository: %s", err)
 
 		return "", err
 	}

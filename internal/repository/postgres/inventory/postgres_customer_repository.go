@@ -1,12 +1,12 @@
 package inventory
 
 import (
-	"fmt"
-	"github.com/gin-gonic/gin"
 	"inventory-app-be/internal/models"
 	"inventory-app-be/internal/repository/postgres/sqlc"
 	"log"
 	"time"
+
+	"github.com/gin-gonic/gin"
 )
 
 func (repo *PostgresInventoryRepository) CreateCustomer(ctx *gin.Context, newCustomer *models.Customer) (*models.Customer, error) {
@@ -20,7 +20,7 @@ func (repo *PostgresInventoryRepository) CreateCustomer(ctx *gin.Context, newCus
 
 	ID, err := repo.db.CreateCustomer(ctx, customer)
 	if err != nil {
-		log.Printf(fmt.Sprintf("Product Repository: %s", err))
+		log.Printf("Product Repository: %s", err)
 
 		return nil, err
 	}
@@ -42,7 +42,7 @@ func (repo *PostgresInventoryRepository) GetCustomers(ctx *gin.Context) ([]*mode
 
 	newCustomers, err := repo.db.GetCustomers(ctx)
 	if err != nil {
-		log.Println(fmt.Sprintf("Product Repository: %s", err))
+		log.Printf("Product Repository: %s", err)
 
 		return nil, err
 	}
@@ -65,7 +65,7 @@ func (repo *PostgresInventoryRepository) GetCustomers(ctx *gin.Context) ([]*mode
 func (repo *PostgresInventoryRepository) GetCustomerByID(ctx *gin.Context, id string) (*models.Customer, error) {
 	customer, err := repo.db.GetCustomersByID(ctx, id)
 	if err != nil {
-		log.Printf(fmt.Sprintf("Product Repository: %s", err))
+		log.Printf("Product Repository: %s", err)
 
 		return nil, err
 	}
@@ -92,7 +92,7 @@ func (repo *PostgresInventoryRepository) UpdateCustomerByID(ctx *gin.Context,
 		UpdatedBy: newCustomer.UpdatedBy,
 	})
 	if err != nil {
-		log.Printf(fmt.Sprintf("Product Repository: %s", err))
+		log.Printf("Product Repository: %s", err)
 
 		return nil, err
 	}
@@ -114,7 +114,7 @@ func (repo *PostgresInventoryRepository) UpdateCustomerByID(ctx *gin.Context,
 func (repo *PostgresInventoryRepository) DeleteCustomerByID(ctx *gin.Context, id string) (string, error) {
 	customerID, err := repo.db.DeleteCustomerByID(ctx, id)
 	if err != nil {
-		log.Printf(fmt.Sprintf("Product Repository: %s", err))
+		log.Printf("Product Repository: %s", err)
 
 		return "", err
 	}

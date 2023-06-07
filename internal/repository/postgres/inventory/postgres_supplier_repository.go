@@ -1,12 +1,12 @@
 package inventory
 
 import (
-	"fmt"
-	"github.com/gin-gonic/gin"
 	"inventory-app-be/internal/models"
 	"inventory-app-be/internal/repository/postgres/sqlc"
 	"log"
 	"time"
+
+	"github.com/gin-gonic/gin"
 )
 
 func (repo *PostgresInventoryRepository) CreateSupplier(ctx *gin.Context, newSupplier *models.Supplier) (*models.Supplier, error) {
@@ -21,7 +21,7 @@ func (repo *PostgresInventoryRepository) CreateSupplier(ctx *gin.Context, newSup
 
 	ID, err := repo.db.CreateSupplier(ctx, supplier)
 	if err != nil {
-		log.Printf(fmt.Sprintf("Supplier Repository: %s", err))
+		log.Printf("Supplier Repository: %s", err)
 
 		return nil, err
 	}
@@ -46,7 +46,7 @@ func (repo *PostgresInventoryRepository) GetSuppliers(ctx *gin.Context) ([]*mode
 
 	newSuppliers, err := repo.db.GetSuppliers(ctx)
 	if err != nil {
-		log.Println(fmt.Sprintf("Supplier Repository: %s", err))
+		log.Printf("Supplier Repository: %s", err)
 
 		return nil, err
 	}
@@ -72,7 +72,7 @@ func (repo *PostgresInventoryRepository) GetSuppliers(ctx *gin.Context) ([]*mode
 func (repo *PostgresInventoryRepository) GetSupplierByID(ctx *gin.Context, id string) (*models.Supplier, error) {
 	supplier, err := repo.db.GetSupplierByID(ctx, id)
 	if err != nil {
-		log.Printf(fmt.Sprintf("Supplier Repository: %s", err))
+		log.Printf("Supplier Repository: %s", err)
 
 		return nil, err
 	}
@@ -102,7 +102,7 @@ func (repo *PostgresInventoryRepository) UpdateSupplierByID(ctx *gin.Context,
 		UpdatedBy:   newSupplier.UpdatedBy,
 	})
 	if err != nil {
-		log.Printf(fmt.Sprintf("Supplier Repository: %s", err))
+		log.Printf("Supplier Repository: %s", err)
 
 		return nil, err
 	}
@@ -125,7 +125,7 @@ func (repo *PostgresInventoryRepository) UpdateSupplierByID(ctx *gin.Context,
 func (repo *PostgresInventoryRepository) DeleteSupplierByID(ctx *gin.Context, id string) (string, error) {
 	supplierID, err := repo.db.DeleteSupplierByID(ctx, id)
 	if err != nil {
-		log.Printf(fmt.Sprintf("Supplier Repository: %s", err))
+		log.Printf("Supplier Repository: %s", err)
 
 		return "", err
 	}

@@ -1,7 +1,6 @@
 package inventory
 
 import (
-	"fmt"
 	"inventory-app-be/internal/models"
 	"inventory-app-be/internal/repository/postgres/sqlc"
 	"log"
@@ -21,7 +20,7 @@ func (repo *PostgresInventoryRepository) CreateProductVariant(ctx *gin.Context, 
 
 	ID, err := repo.db.CreateProductVariant(ctx, productVariant)
 	if err != nil {
-		log.Printf(fmt.Sprintf("Product variant Repository: %s", err))
+		log.Printf("Product variant Repository: %s", err)
 
 		return nil, err
 	}
@@ -45,7 +44,7 @@ func (repo *PostgresInventoryRepository) GetProductVariants(ctx *gin.Context) ([
 
 	pVariants, err := repo.db.GetProductVariants(ctx)
 	if err != nil {
-		log.Printf(fmt.Sprintf("Product variant Repository: %s", err))
+		log.Printf("Product variant Repository: %s", err)
 
 		return nil, err
 	}
@@ -70,7 +69,7 @@ func (repo *PostgresInventoryRepository) GetProductVariants(ctx *gin.Context) ([
 func (repo *PostgresInventoryRepository) GetProductVariantsByProductID(ctx *gin.Context, id string) ([]*models.ProductVariant, error) {
 	pVariants, err := repo.db.GetProductVariantsByProductID(ctx, id)
 	if err != nil {
-		log.Printf(fmt.Sprintf("Product variant Repository: %s", err))
+		log.Printf("Product variant Repository: %s", err)
 
 		return nil, err
 	}
@@ -97,7 +96,7 @@ func (repo *PostgresInventoryRepository) GetProductVariantsByProductID(ctx *gin.
 func (repo *PostgresInventoryRepository) GetProductVariantByID(ctx *gin.Context, id string) (*models.ProductVariant, error) {
 	pVariant, err := repo.db.GetProductVariantByID(ctx, id)
 	if err != nil {
-		log.Printf(fmt.Sprintf("Product variant Repository: %s", err))
+		log.Printf("Product variant Repository: %s", err)
 
 		return nil, err
 	}
@@ -128,7 +127,7 @@ func (repo *PostgresInventoryRepository) UpdateProductVariantByID(ctx *gin.Conte
 		UpdatedBy: newPVariant.UpdatedBy,
 	})
 	if err != nil {
-		log.Printf(fmt.Sprintf("Product variant Repository: %s", err))
+		log.Printf("Product variant Repository: %s", err)
 
 		return nil, err
 	}
@@ -150,7 +149,7 @@ func (repo *PostgresInventoryRepository) UpdateProductVariantByID(ctx *gin.Conte
 func (repo *PostgresInventoryRepository) DeleteProductVariantByID(ctx *gin.Context, id string) (string, error) {
 	productID, err := repo.db.DeleteProductVariantByID(ctx, id)
 	if err != nil {
-		log.Printf(fmt.Sprintf("Product variant Repository: %s", err))
+		log.Printf("Product variant Repository: %s", err)
 
 		return "", err
 	}
