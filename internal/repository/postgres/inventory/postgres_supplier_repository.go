@@ -15,8 +15,8 @@ func (repo *PostgresInventoryRepository) CreateSupplier(ctx *gin.Context, newSup
 		PhoneNumber: newSupplier.Phone,
 		Email:       newSupplier.Email,
 		Address:     newSupplier.Address,
-		CreatedBy:   newSupplier.CreatedBy,
-		UpdatedBy:   newSupplier.UpdatedBy,
+		CreatedBy:   ctx.GetString("full_name"),
+		UpdatedBy:   ctx.GetString("full_name"),
 	}
 
 	ID, err := repo.db.CreateSupplier(ctx, supplier)
@@ -98,7 +98,7 @@ func (repo *PostgresInventoryRepository) UpdateSupplierByID(ctx *gin.Context,
 		PhoneNumber: newSupplier.Phone,
 		Email:       newSupplier.Email,
 		Address:     newSupplier.Address,
-		UpdatedBy:   newSupplier.UpdatedBy,
+		UpdatedBy:   ctx.GetString("full_name"),
 	})
 	if err != nil {
 		log.Printf("Supplier Repository: %s", err)

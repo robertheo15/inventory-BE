@@ -14,8 +14,8 @@ func (repo *PostgresInventoryRepository) CreateCustomer(ctx *gin.Context, newCus
 		FullName:    newCustomer.FullName,
 		PhoneNumber: newCustomer.Phone,
 		Address:     newCustomer.Address,
-		CreatedBy:   newCustomer.CreatedBy,
-		UpdatedBy:   newCustomer.UpdatedBy,
+		CreatedBy:   ctx.GetString("full_name"),
+		UpdatedBy:   ctx.GetString("full_name"),
 	}
 
 	ID, err := repo.db.CreateCustomer(ctx, customer)
@@ -75,8 +75,8 @@ func (repo *PostgresInventoryRepository) GetCustomerByID(ctx *gin.Context, id st
 		FullName:  customer.FullName,
 		Phone:     customer.PhoneNumber,
 		Address:   customer.Address,
-		CreatedBy: customer.CreatedBy,
-		UpdatedBy: customer.UpdatedBy,
+		CreatedBy: ctx.GetString("full_name"),
+		UpdatedBy: ctx.GetString("full_name"),
 	}
 
 	return newCustomer, nil
@@ -89,7 +89,7 @@ func (repo *PostgresInventoryRepository) UpdateCustomerByID(ctx *gin.Context,
 		FullName:  newCustomer.FullName,
 		Address:   newCustomer.Address,
 		CreatedAt: newCustomer.CreatedAt,
-		UpdatedBy: newCustomer.UpdatedBy,
+		UpdatedBy: ctx.GetString("full_name"),
 	})
 	if err != nil {
 		log.Printf("Product Repository: %s", err)

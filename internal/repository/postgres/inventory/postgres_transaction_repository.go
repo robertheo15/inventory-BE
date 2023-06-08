@@ -16,8 +16,8 @@ func (repo *PostgresInventoryRepository) CreateTransaction(ctx *gin.Context, new
 		Invoice:       newTransaction.Invoice,
 		Status:        newTransaction.Status,
 		Type:          newTransaction.Type,
-		CreatedBy:     newTransaction.CreatedBy,
-		UpdatedByy:    newTransaction.UpdatedBy,
+		CreatedBy:     ctx.GetString("full_name"),
+		UpdatedByy:    ctx.GetString("full_name"),
 	}
 
 	ID, err := repo.db.CreateTransaction(ctx, transaction)
@@ -108,7 +108,7 @@ func (repo *PostgresInventoryRepository) UpdateTransactionByID(ctx *gin.Context,
 		Invoice:       newTransaction.Invoice,
 		Status:        newTransaction.Status,
 		Type:          newTransaction.Type,
-		CreatedBy:     newTransaction.CreatedBy,
+		CreatedBy:     ctx.GetString("full_name"),
 		UpdatedBy:     newTransaction.UpdatedBy,
 	}
 

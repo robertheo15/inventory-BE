@@ -3,6 +3,7 @@ package inventory
 import (
 	"inventory-app-be/internal/models"
 	"inventory-app-be/internal/repository/postgres/sqlc"
+	pkgHttp "inventory-app-be/pkg/http"
 	"log"
 	"time"
 
@@ -54,6 +55,7 @@ func (repo *PostgresInventoryRepository) GetUserByID(ctx *gin.Context, id string
 
 	newUser := &models.User{
 		ID:       user.ID,
+		Password: user.Password,
 		FullName: user.FullName,
 	}
 
@@ -118,6 +120,20 @@ func (repo *PostgresInventoryRepository) UpdateUserByID(ctx *gin.Context, newUse
 	}
 
 	return resultNewUser, nil
+}
+
+func (repo *PostgresInventoryRepository) UpdateUserPasswordByID(ctx *gin.Context, newUser *models.User) (string, error) {
+	_, err := repo.db.UpdateUserPasswordByID(ctx, sqlc.UpdateUserPasswordByIDParams{
+		ID:       newUser.ID,
+		Password: newUser.Password,
+	})
+	if err != nil {
+		log.Printf("User repository update password by id: %s", err)
+
+		return "", err
+	}
+
+	return pkgHttp.PasswordChanged, nil
 }
 
 func (repo *PostgresInventoryRepository) DeActiveUserByID(ctx *gin.Context, newUser *models.User) (*models.User, error) {

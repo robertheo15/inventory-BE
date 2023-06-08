@@ -14,8 +14,8 @@ func (repo *PostgresInventoryRepository) CreateProductVariant(ctx *gin.Context, 
 		PID:       newProductVariant.ProductID,
 		Name:      newProductVariant.Name,
 		Colour:    newProductVariant.Colour,
-		CreatedBy: newProductVariant.CreatedBy,
-		UpdatedBy: newProductVariant.UpdatedBy,
+		CreatedBy: ctx.GetString("full_name"),
+		UpdatedBy: ctx.GetString("full_name"),
 	}
 
 	ID, err := repo.db.CreateProductVariant(ctx, productVariant)
@@ -31,8 +31,8 @@ func (repo *PostgresInventoryRepository) CreateProductVariant(ctx *gin.Context, 
 		Name:      productVariant.Name,
 		Colour:    productVariant.Colour,
 		CreatedAt: time.Now(),
-		CreatedBy: newProductVariant.CreatedBy,
 		UpdatedAt: time.Now(),
+		CreatedBy: newProductVariant.CreatedBy,
 		UpdatedBy: newProductVariant.UpdatedBy,
 	}
 
@@ -121,7 +121,7 @@ func (repo *PostgresInventoryRepository) UpdateProductVariantByID(ctx *gin.Conte
 		PID:       newPVariant.ProductID,
 		Name:      newPVariant.Name,
 		Colour:    newPVariant.Colour,
-		CreatedBy: newPVariant.CreatedBy,
+		CreatedBy: ctx.GetString("full_name"),
 		UpdatedAt: newPVariant.UpdatedAt,
 		UpdatedBy: newPVariant.UpdatedBy,
 	})

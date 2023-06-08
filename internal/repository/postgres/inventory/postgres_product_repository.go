@@ -21,8 +21,8 @@ func (repo *PostgresInventoryRepository) CreateProduct(ctx *gin.Context, newProd
 		PriceGrosir: newProduct.GrosirPrice,
 		Image:       newProduct.Image,
 		Type:        newProduct.Type,
-		CreatedBy:   "system",
-		UpdatedBy:   "system",
+		CreatedBy:   ctx.GetString("full_name"),
+		UpdatedBy:   ctx.GetString("full_name"),
 	}
 
 	ID, err := repo.db.CreateProduct(ctx, product)
@@ -47,7 +47,7 @@ func (repo *PostgresInventoryRepository) CreateProduct(ctx *gin.Context, newProd
 		CreatedAt:   time.Now(),
 		UpdatedAt:   time.Now(),
 		CreatedBy:   product.CreatedBy,
-		UpdatedBy:   "system",
+		UpdatedBy:   product.UpdatedBy,
 	}
 
 	return resultProduct, nil
@@ -130,7 +130,7 @@ func (repo *PostgresInventoryRepository) UpdateProductByID(ctx *gin.Context, new
 		Pricegrosir: newProduct.GrosirPrice,
 		Image:       newProduct.Image,
 		Type:        newProduct.Type,
-		Updatedby:   "system",
+		Updatedby:   ctx.GetString("full_name"),
 	})
 	if err != nil {
 		log.Printf("Product Repository: %s", err)
@@ -153,7 +153,7 @@ func (repo *PostgresInventoryRepository) UpdateProductByID(ctx *gin.Context, new
 		CreatedAt:   product.CreatedAt,
 		UpdatedAt:   product.UpdatedAt,
 		CreatedBy:   product.CreatedBy,
-		UpdatedBy:   "system",
+		UpdatedBy:   product.UpdatedBy,
 	}
 
 	return resultProduct, nil
