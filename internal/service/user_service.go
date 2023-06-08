@@ -43,7 +43,7 @@ func (s *Service) GetUserByEmail(ctx *gin.Context, loginUser *models.User) (stri
 
 	comparePass := middleware.ComparePassword(user.Password, loginUser.Password)
 	if !comparePass {
-		return "", errors.New("username / password is not match")
+		return "", errors.New("email / password is not match")
 	}
 
 	token := middleware.GenerateToken(user)
@@ -58,6 +58,32 @@ func (s *Service) UpdateUserByID(ctx *gin.Context, newUser *models.User) (*model
 	}
 
 	return user, nil
+}
+
+func (s *Service) UpdatePasswordByID(ctx *gin.Context, newUser *models.User) (string, error) {
+	user, err := s.inventoryRepo.GetUserByID(ctx, newUser.ID)
+	if err != nil {
+		return "", err
+	}
+
+	comparePass := middleware.ComparePassword(user.Password, newUser.OldPassword)
+	if !comparePass {
+		return "", errors.New("email / old password is not match")
+	}
+
+	newPassword, err := middleware.HashPassword(newUser.Password)
+	if err != nil {
+		return "", err
+	}
+
+	newUser.Password = newPassword
+
+	message, err := s.inventoryRepo.UpdateUserPasswordByID(ctx, newUser)
+	if err != nil {
+		return "", err
+	}
+
+	return message, nil
 }
 
 func (s *Service) GetUserDetail(token string) (interface{}, error) {

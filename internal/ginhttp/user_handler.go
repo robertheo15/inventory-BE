@@ -49,7 +49,7 @@ func (s *Server) login(ctx *gin.Context) {
 	if err != nil {
 		pkgHttp.WriteJSONResponse(ctx, http.StatusBadRequest, nil, err.Error())
 	} else {
-		pkgHttp.WriteJSONResponse(ctx, http.StatusOK, token, pkgHttp.Created)
+		pkgHttp.WriteJSONResponse(ctx, http.StatusOK, token, pkgHttp.LoggedIn)
 	}
 }
 
@@ -76,6 +76,25 @@ func (s *Server) getUserByID(ctx *gin.Context) {
 		pkgHttp.WriteJSONResponse(ctx, http.StatusBadRequest, nil, err.Error())
 	} else {
 		pkgHttp.WriteJSONResponse(ctx, http.StatusOK, user, pkgHttp.Get)
+	}
+}
+
+func (s *Server) updateUserPasswordByID(ctx *gin.Context) {
+	var user *models.User
+
+	err := ctx.ShouldBindJSON(&user)
+	if err != nil {
+		pkgHttp.WriteJSONResponse(ctx, http.StatusBadRequest, nil, err.Error())
+		return
+	}
+
+	user.ID = ctx.GetString("id")
+
+	message, err := s.service.UpdatePasswordByID(ctx, user)
+	if err != nil {
+		pkgHttp.WriteJSONResponse(ctx, http.StatusBadRequest, nil, err.Error())
+	} else {
+		pkgHttp.WriteJSONResponse(ctx, http.StatusOK, message, pkgHttp.PasswordChanged)
 	}
 }
 

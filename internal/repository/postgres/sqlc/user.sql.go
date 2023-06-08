@@ -101,7 +101,7 @@ func (q *Queries) GetUserByEmail(ctx context.Context, email string) (GetUserByEm
 }
 
 const getUserByID = `-- name: GetUserByID :one
-SELECT id::char(36), full_name::varchar, phone_number::varchar, email::varchar, role::integer, active::integer, created_at::timestamp, updated_at::timestamp, created_by::varchar, updated_by::varchar
+SELECT id::char(36), full_name::varchar, password::varchar, phone_number::varchar, email::varchar, role::integer, active::integer, created_at::timestamp, updated_at::timestamp, created_by::varchar, updated_by::varchar
 FROM users
 WHERE id = $1::char(36)
 `
@@ -109,6 +109,7 @@ WHERE id = $1::char(36)
 type GetUserByIDRow struct {
 	ID          string    `json:"id"`
 	FullName    string    `json:"full_name"`
+	Password    string    `json:"password"`
 	PhoneNumber string    `json:"phone_number"`
 	Email       string    `json:"email"`
 	Role        int32     `json:"role"`
@@ -125,6 +126,7 @@ func (q *Queries) GetUserByID(ctx context.Context, id string) (GetUserByIDRow, e
 	err := row.Scan(
 		&i.ID,
 		&i.FullName,
+		&i.Password,
 		&i.PhoneNumber,
 		&i.Email,
 		&i.Role,
@@ -134,39 +136,6 @@ func (q *Queries) GetUserByID(ctx context.Context, id string) (GetUserByIDRow, e
 		&i.CreatedBy,
 		&i.UpdatedBy,
 	)
-	return i, err
-}
-
-const updatePasswordByID = `-- name: UpdatePasswordByID :one
-UPDATE users
-SET     password = $1::varchar,
-        updated_at = (now() at time zone 'Asia/Jakarta'):: timestamp,
-        created_by = $2::varchar,
-        updated_by = $3::varchar
-WHERE id = $4:: char (36) returning id::char(36), created_at::timestamp
-`
-
-type UpdatePasswordByIDParams struct {
-	Password  string `json:"password"`
-	CreatedBy string `json:"created_by"`
-	UpdatedBy string `json:"updated_by"`
-	ID        string `json:"id"`
-}
-
-type UpdatePasswordByIDRow struct {
-	ID        string    `json:"id"`
-	CreatedAt time.Time `json:"created_at"`
-}
-
-func (q *Queries) UpdatePasswordByID(ctx context.Context, arg UpdatePasswordByIDParams) (UpdatePasswordByIDRow, error) {
-	row := q.db.QueryRowContext(ctx, updatePasswordByID,
-		arg.Password,
-		arg.CreatedBy,
-		arg.UpdatedBy,
-		arg.ID,
-	)
-	var i UpdatePasswordByIDRow
-	err := row.Scan(&i.ID, &i.CreatedAt)
 	return i, err
 }
 
@@ -208,4 +177,37 @@ func (q *Queries) UpdateUserByID(ctx context.Context, arg UpdateUserByIDParams) 
 	var id string
 	err := row.Scan(&id)
 	return id, err
+}
+
+const updateUserPasswordByID = `-- name: UpdateUserPasswordByID :one
+UPDATE users
+SET     password = $1::varchar,
+        updated_at = (now() at time zone 'Asia/Jakarta'):: timestamp,
+        created_by = $2::varchar,
+        updated_by = $3::varchar
+WHERE id = $4:: char (36) returning id::char(36), created_at::timestamp
+`
+
+type UpdateUserPasswordByIDParams struct {
+	Password  string `json:"password"`
+	CreatedBy string `json:"created_by"`
+	UpdatedBy string `json:"updated_by"`
+	ID        string `json:"id"`
+}
+
+type UpdateUserPasswordByIDRow struct {
+	ID        string    `json:"id"`
+	CreatedAt time.Time `json:"created_at"`
+}
+
+func (q *Queries) UpdateUserPasswordByID(ctx context.Context, arg UpdateUserPasswordByIDParams) (UpdateUserPasswordByIDRow, error) {
+	row := q.db.QueryRowContext(ctx, updateUserPasswordByID,
+		arg.Password,
+		arg.CreatedBy,
+		arg.UpdatedBy,
+		arg.ID,
+	)
+	var i UpdateUserPasswordByIDRow
+	err := row.Scan(&i.ID, &i.CreatedAt)
+	return i, err
 }

@@ -10,7 +10,7 @@ VALUES ((gen_random_uuid()):: char (36), @full_name::varchar, @password::varchar
         @updated_by::varchar) RETURNING id::char(36);
 
 -- name: GetUserByID :one
-SELECT id::char(36), full_name::varchar, phone_number::varchar, email::varchar, role::integer, active::integer, created_at::timestamp, updated_at::timestamp, created_by::varchar, updated_by::varchar
+SELECT id::char(36), full_name::varchar, password::varchar, phone_number::varchar, email::varchar, role::integer, active::integer, created_at::timestamp, updated_at::timestamp, created_by::varchar, updated_by::varchar
 FROM users
 WHERE id = @id::char(36);
 
@@ -31,7 +31,7 @@ SET full_name = @full_name::varchar,
         updated_by = @updated_by::varchar
 WHERE id = @id:: char (36) returning id;
 
--- name: UpdatePasswordByID :one
+-- name: UpdateUserPasswordByID :one
 UPDATE users
 SET     password = @password::varchar,
         updated_at = (now() at time zone 'Asia/Jakarta'):: timestamp,
