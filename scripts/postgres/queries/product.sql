@@ -61,6 +61,20 @@ WHERE id = @id:: char (36) returning id::char(36), product_id::char(36),
     name:: varchar, brand::varchar, description::varchar, stock::integer, base_price::float, price_eceran::float, price_grosir::float
     , image::varchar, type::varchar, created_at::timestamp, updated_at::timestamp, created_by::varchar, updated_by::varchar;
 
+-- name: UpdateProductStockParentByID :exec
+UPDATE products
+SET stock= @stock:: integer,
+    updated_at = (now() at time zone 'Asia/Jakarta'):: timestamp,
+    updated_by = @updatedBy:: varchar
+WHERE id = @id:: char (36);
+
+-- name: UpdateProductStockChildByID :exec
+UPDATE products
+SET stock= @stock:: integer,
+    updated_at = (now() at time zone 'Asia/Jakarta'):: timestamp,
+    updated_by = @updatedBy:: varchar
+WHERE product_id = @product_id:: char (36);
+
 -- name: DeleteProductByID :one
 DELETE
 FROM products

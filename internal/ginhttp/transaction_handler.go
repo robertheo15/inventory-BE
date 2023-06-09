@@ -4,13 +4,14 @@ import (
 	"fmt"
 	"inventory-app-be/internal/models"
 	pkgHttp "inventory-app-be/pkg/http"
+	"inventory-app-be/pkg/http/response"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
 
 func (s *Server) createTransaction(ctx *gin.Context) {
-	var newTransaction *models.Transaction
+	var newTransaction *response.TransactionRequest
 
 	err := ctx.ShouldBindJSON(&newTransaction)
 	if err != nil {
@@ -18,32 +19,32 @@ func (s *Server) createTransaction(ctx *gin.Context) {
 		return
 	}
 
-	supplier, err := s.service.CreateTransaction(ctx, newTransaction)
+	transaction, err := s.service.CreateTransaction(ctx, newTransaction)
 	if err != nil {
 		pkgHttp.WriteJSONResponse(ctx, http.StatusBadRequest, nil, err.Error())
 	} else {
-		pkgHttp.WriteJSONResponse(ctx, http.StatusOK, supplier, pkgHttp.Created)
+		pkgHttp.WriteJSONResponse(ctx, http.StatusOK, transaction, pkgHttp.Created)
 	}
 }
 
 func (s *Server) getTransactions(ctx *gin.Context) {
-	suppliers, err := s.service.GetTransactions(ctx)
+	transactions, err := s.service.GetTransactions(ctx)
 
 	if err != nil {
 		pkgHttp.WriteJSONResponse(ctx, http.StatusBadRequest, nil, err.Error())
 	} else {
-		pkgHttp.WriteJSONResponse(ctx, http.StatusOK, suppliers, pkgHttp.Get)
+		pkgHttp.WriteJSONResponse(ctx, http.StatusOK, transactions, pkgHttp.Get)
 	}
 }
 
 func (s *Server) getTransactionByID(ctx *gin.Context) {
-	supplierID := ctx.Param("transactionID")
+	transactionID := ctx.Param("transactionID")
 
-	supplier, err := s.service.GetTransactionByID(ctx, supplierID)
+	transaction, err := s.service.GetTransactionByID(ctx, transactionID)
 	if err != nil {
 		pkgHttp.WriteJSONResponse(ctx, http.StatusBadRequest, nil, err.Error())
 	} else {
-		pkgHttp.WriteJSONResponse(ctx, http.StatusOK, supplier, pkgHttp.Get)
+		pkgHttp.WriteJSONResponse(ctx, http.StatusOK, transaction, pkgHttp.Get)
 	}
 }
 
@@ -56,22 +57,22 @@ func (s *Server) updateTransactionByID(ctx *gin.Context) {
 		return
 	}
 
-	supplier, err := s.service.UpdateTransactionByID(ctx, newTransaction)
+	transaction, err := s.service.UpdateTransactionByID(ctx, newTransaction)
 	if err != nil {
 		pkgHttp.WriteJSONResponse(ctx, http.StatusBadRequest, nil, err.Error())
 	} else {
-		pkgHttp.WriteJSONResponse(ctx, http.StatusOK, supplier, pkgHttp.Updated)
+		pkgHttp.WriteJSONResponse(ctx, http.StatusOK, transaction, pkgHttp.Updated)
 	}
 }
 
 func (s *Server) deleteTransactionByID(ctx *gin.Context) {
-	supplierID := ctx.Param("transactionID")
+	transactionID := ctx.Param("transactionID")
 
-	supplierID, err := s.service.DeleteTransactionByID(ctx, supplierID)
+	transactionID, err := s.service.DeleteTransactionByID(ctx, transactionID)
 	if err != nil {
 		pkgHttp.WriteJSONResponse(ctx, http.StatusBadRequest, nil, err.Error())
 	} else {
 		pkgHttp.WriteJSONResponse(ctx, http.StatusOK,
-			fmt.Sprintf("Transaction dengan id: %s berhasil dihapus", supplierID), pkgHttp.Deleted)
+			fmt.Sprintf("Transaction dengan id: %s berhasil dihapus", transactionID), pkgHttp.Deleted)
 	}
 }

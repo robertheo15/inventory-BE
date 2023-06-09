@@ -291,3 +291,41 @@ func (q *Queries) UpdateProductByID(ctx context.Context, arg UpdateProductByIDPa
 	)
 	return i, err
 }
+
+const updateProductStockChildByID = `-- name: UpdateProductStockChildByID :exec
+UPDATE products
+SET stock= $1:: integer,
+    updated_at = (now() at time zone 'Asia/Jakarta'):: timestamp,
+    updated_by = $2:: varchar
+WHERE product_id = $3:: char (36)
+`
+
+type UpdateProductStockChildByIDParams struct {
+	Stock     int32  `json:"stock"`
+	Updatedby string `json:"updatedby"`
+	ProductID string `json:"product_id"`
+}
+
+func (q *Queries) UpdateProductStockChildByID(ctx context.Context, arg UpdateProductStockChildByIDParams) error {
+	_, err := q.db.ExecContext(ctx, updateProductStockChildByID, arg.Stock, arg.Updatedby, arg.ProductID)
+	return err
+}
+
+const updateProductStockParentByID = `-- name: UpdateProductStockParentByID :exec
+UPDATE products
+SET stock= $1:: integer,
+    updated_at = (now() at time zone 'Asia/Jakarta'):: timestamp,
+    updated_by = $2:: varchar
+WHERE id = $3:: char (36)
+`
+
+type UpdateProductStockParentByIDParams struct {
+	Stock     int32  `json:"stock"`
+	Updatedby string `json:"updatedby"`
+	ID        string `json:"id"`
+}
+
+func (q *Queries) UpdateProductStockParentByID(ctx context.Context, arg UpdateProductStockParentByIDParams) error {
+	_, err := q.db.ExecContext(ctx, updateProductStockParentByID, arg.Stock, arg.Updatedby, arg.ID)
+	return err
+}

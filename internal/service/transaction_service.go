@@ -2,11 +2,12 @@ package service
 
 import (
 	"inventory-app-be/internal/models"
+	"inventory-app-be/pkg/http/response"
 
 	"github.com/gin-gonic/gin"
 )
 
-func (s *Service) CreateTransaction(ctx *gin.Context, newTransaction *models.Transaction) (*models.Transaction, error) {
+func (s *Service) CreateTransaction(ctx *gin.Context, newTransaction *response.TransactionRequest) (*response.TransactionResponse, error) {
 	transaction, err := s.inventoryRepo.CreateTransaction(ctx, newTransaction)
 	if err != nil {
 		return nil, err
