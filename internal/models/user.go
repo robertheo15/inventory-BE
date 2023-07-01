@@ -13,7 +13,7 @@ var (
 type User struct {
 	ID          string    `json:"id"`
 	FullName    string    `json:"full_name"`
-	OldPassword string    `validate:"required" json:"old_password,omitempty"`
+	OldPassword string    `json:"old_password,omitempty"`
 	Password    string    `validate:"required" json:"password,omitempty"`
 	PhoneNumber string    `json:"phone_number"`
 	Email       string    `validate:"required,email" json:"email" `

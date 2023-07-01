@@ -40,6 +40,9 @@ func (s *Server) Run(ctx context.Context) {
 		userGroup.DELETE("/:userID", s.deleteUserByID)
 	}
 
+	// admin
+	s.router.POST("/admins/registers", s.createUser)
+
 	// customers
 	s.router.POST("/customers", s.createCustomer)
 	s.router.GET("/customers", s.getCustomers)

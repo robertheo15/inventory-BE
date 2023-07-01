@@ -18,8 +18,8 @@ func (repo *PostgresInventoryRepository) CreateUser(ctx *gin.Context, newUser *m
 		Email:       newUser.Email,
 		Role:        newUser.Role,
 		Active:      newUser.Active,
-		CreatedBy:   newUser.CreatedBy,
-		UpdatedBy:   newUser.UpdatedBy,
+		CreatedBy:   ctx.GetString("full_name"),
+		UpdatedBy:   ctx.GetString("full_name"),
 	}
 
 	userID, err := repo.db.CreateUser(ctx, userSqlcParam)
@@ -43,6 +43,30 @@ func (repo *PostgresInventoryRepository) CreateUser(ctx *gin.Context, newUser *m
 	}
 
 	return resultUser, nil
+}
+
+func (repo *PostgresInventoryRepository) GetUsers(ctx *gin.Context) ([]*models.User, error) {
+	users := make([]*models.User, 0)
+	resUsers, err := repo.db.GetUsers(ctx)
+	if err != nil {
+		log.Printf("Get user by id repository error: %s", err)
+
+		return nil, err
+	}
+
+	for _, resUser := range resUsers {
+		user := &models.User{
+			FullName:    resUser.FullName,
+			PhoneNumber: resUser.PhoneNumber,
+			Email:       resUser.Email,
+			Role:        resUser.Role,
+			Active:      resUser.Active,
+		}
+
+		users = append(users, user)
+	}
+
+	return users, nil
 }
 
 func (repo *PostgresInventoryRepository) GetUserByID(ctx *gin.Context, id string) (*models.User, error) {
@@ -95,8 +119,8 @@ func (repo *PostgresInventoryRepository) UpdateUserByID(ctx *gin.Context, newUse
 		Email:       newUser.Email,
 		Role:        newUser.Role,
 		Active:      newUser.Active,
-		CreatedBy:   newUser.CreatedBy,
-		UpdatedBy:   newUser.UpdatedBy,
+		CreatedBy:   ctx.GetString("full_name"),
+		UpdatedBy:   ctx.GetString("full_name"),
 	}
 
 	userID, err := repo.db.UpdateUserByID(ctx, userSqlcUpdateParams)

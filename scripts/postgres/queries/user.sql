@@ -9,6 +9,14 @@ VALUES ((gen_random_uuid()):: char (36), @full_name::varchar, @password::varchar
         (now() at time zone 'Asia/Jakarta'):: timestamp, @created_by::varchar,
         @updated_by::varchar) RETURNING id::char(36);
 
+-- name: GetUsers :many
+SELECT full_name::varchar,
+        phone_number::varchar,
+        email::varchar,
+        role::integer,
+        active::integer
+ FROM users;
+
 -- name: GetUserByID :one
 SELECT id::char(36), full_name::varchar, password::varchar, phone_number::varchar, email::varchar, role::integer, active::integer, created_at::timestamp, updated_at::timestamp, created_by::varchar, updated_by::varchar
 FROM users
