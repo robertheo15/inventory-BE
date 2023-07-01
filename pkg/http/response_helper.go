@@ -7,10 +7,12 @@ import (
 )
 
 var (
-	Get     = "Data berhasil diambil"
-	Created = "Data berhasil ditambah"
-	Updated = "Data berhasil diubah"
-	Deleted = "Data berhasil dihapus"
+	Get             = "Data berhasil diambil"
+	Created         = "Data berhasil ditambah"
+	Updated         = "Data berhasil diubah"
+	Deleted         = "Data berhasil dihapus"
+	PasswordChanged = "Password berhasil diubah"
+	LoggedIn        = "Berhasil login"
 )
 
 func WriteJSONResponse(ctx *gin.Context, status int, payload interface{}, message interface{}) {
