@@ -173,7 +173,7 @@ func (repo *PostgresInventoryRepository) DeActiveUserByID(ctx *gin.Context, newU
 func (repo *PostgresInventoryRepository) DeleteUserByID(ctx *gin.Context, id string) (string, error) {
 	userID, err := repo.db.DeleteUserByID(ctx, id)
 	if err != nil {
-		log.Printf("Product Repository: %s", err)
+		log.Printf("User Repository: %s", err)
 
 		return "", err
 	}
