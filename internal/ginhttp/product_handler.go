@@ -48,6 +48,17 @@ func (s *Server) getProductByID(ctx *gin.Context) {
 	}
 }
 
+func (s *Server) getProductBySupplierID(ctx *gin.Context) {
+	supplierID := ctx.Param("supplierID")
+
+	products, err := s.service.GetProductBySupplierID(ctx, supplierID)
+	if err != nil {
+		pkgHttp.WriteJSONResponse(ctx, http.StatusBadRequest, nil, err.Error())
+	} else {
+		pkgHttp.WriteJSONResponse(ctx, http.StatusOK, products, pkgHttp.Get)
+	}
+}
+
 func (s *Server) updateProductByID(ctx *gin.Context) {
 	var newProduct *models.Product
 
