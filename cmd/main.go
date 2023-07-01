@@ -2,13 +2,14 @@ package main
 
 import (
 	"context"
-	"github.com/gin-gonic/gin"
 	"inventory-app-be/internal/config"
 	"inventory-app-be/internal/ginhttp"
 	repository "inventory-app-be/internal/repository/postgres/inventory"
 	"inventory-app-be/internal/service"
 	"log"
 	"time"
+
+	"github.com/gin-gonic/gin"
 )
 
 func main() {
