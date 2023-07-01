@@ -13,10 +13,21 @@ type Customer struct {
 	FullName    sql.NullString `json:"full_name"`
 	PhoneNumber sql.NullString `json:"phone_number"`
 	Address     sql.NullString `json:"address"`
+	Email       sql.NullString `json:"email"`
 	CreatedAt   sql.NullTime   `json:"created_at"`
 	UpdatedAt   sql.NullTime   `json:"updated_at"`
 	CreatedBy   sql.NullString `json:"created_by"`
 	UpdatedBy   sql.NullString `json:"updated_by"`
+}
+
+type Price struct {
+	ID        string         `json:"id"`
+	Eceran    sql.NullString `json:"eceran"`
+	Grosir    sql.NullString `json:"grosir"`
+	CreatedAt sql.NullTime   `json:"created_at"`
+	UpdatedAt sql.NullTime   `json:"updated_at"`
+	CreatedBy sql.NullString `json:"created_by"`
+	UpdatedBy sql.NullString `json:"updated_by"`
 }
 
 type Product struct {
@@ -26,7 +37,6 @@ type Product struct {
 	Name        sql.NullString `json:"name"`
 	Brand       sql.NullString `json:"brand"`
 	Description sql.NullString `json:"description"`
-	Stock       sql.NullInt32  `json:"stock"`
 	BasePrice   sql.NullString `json:"base_price"`
 	PriceEceran sql.NullString `json:"price_eceran"`
 	PriceGrosir sql.NullString `json:"price_grosir"`
@@ -43,6 +53,8 @@ type ProductVariant struct {
 	PID       sql.NullString `json:"p_id"`
 	Name      sql.NullString `json:"name"`
 	Colour    sql.NullString `json:"colour"`
+	Qty       sql.NullInt32  `json:"qty"`
+	Location  sql.NullString `json:"location"`
 	CreatedAt sql.NullTime   `json:"created_at"`
 	UpdatedAt sql.NullTime   `json:"updated_at"`
 	CreatedBy sql.NullString `json:"created_by"`
@@ -78,6 +90,7 @@ type TransactionDetail struct {
 	ID        string         `json:"id"`
 	TID       sql.NullString `json:"t_id"`
 	PID       sql.NullString `json:"p_id"`
+	PvID      sql.NullString `json:"pv_id"`
 	Price     sql.NullString `json:"price"`
 	Qty       sql.NullInt32  `json:"qty"`
 	CreatedAt sql.NullTime   `json:"created_at"`

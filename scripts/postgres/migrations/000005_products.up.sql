@@ -7,7 +7,6 @@ CREATE TABLE products
     name         varchar,
     brand        varchar,
     description  varchar,
-    stock        integer,
     base_price   numeric,
     price_eceran numeric,
     price_grosir numeric,

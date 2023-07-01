@@ -11,21 +11,23 @@ import (
 )
 
 const createTransactionDetail = `-- name: CreateTransactionDetail :one
-INSERT INTO transaction_details (id, t_id, p_id, price, qty, created_at, updated_at, created_by, updated_by)
+INSERT INTO transaction_details (id, t_id, p_id, pv_id, price, qty, created_at, updated_at, created_by, updated_by)
 VALUES (gen_random_uuid(),
         $1::char(36),
         $2::char(36),
-        $3::float,
-        $4::integer,
+        $3::char(36),
+        $4::float,
+        $5::integer,
         now() at time zone 'Asia/Jakarta',
         now() at time zone 'Asia/Jakarta',
-        $5::varchar,
-        $6::varchar) RETURNING id::char(36)
+        $6::varchar,
+        $7::varchar) RETURNING id::char(36)
 `
 
 type CreateTransactionDetailParams struct {
 	TID       string  `json:"t_id"`
 	PID       string  `json:"p_id"`
+	PvID      string  `json:"pv_id"`
 	Price     float64 `json:"price"`
 	Qty       int32   `json:"qty"`
 	CreatedBy string  `json:"created_by"`
@@ -36,6 +38,7 @@ func (q *Queries) CreateTransactionDetail(ctx context.Context, arg CreateTransac
 	row := q.db.QueryRowContext(ctx, createTransactionDetail,
 		arg.TID,
 		arg.PID,
+		arg.PvID,
 		arg.Price,
 		arg.Qty,
 		arg.CreatedBy,
@@ -63,6 +66,7 @@ const getTransactionDetailByID = `-- name: GetTransactionDetailByID :one
 SELECT  id::char(36),
         t_id::char(36),
         p_id::char(36),
+        pv_id::char(36),
         price::float,
         qty::integer,
         created_at::timestamp,
@@ -77,6 +81,7 @@ type GetTransactionDetailByIDRow struct {
 	ID        string    `json:"id"`
 	TID       string    `json:"t_id"`
 	PID       string    `json:"p_id"`
+	PvID      string    `json:"pv_id"`
 	Price     float64   `json:"price"`
 	Qty       int32     `json:"qty"`
 	CreatedAt time.Time `json:"created_at"`
@@ -92,6 +97,7 @@ func (q *Queries) GetTransactionDetailByID(ctx context.Context, id string) (GetT
 		&i.ID,
 		&i.TID,
 		&i.PID,
+		&i.PvID,
 		&i.Price,
 		&i.Qty,
 		&i.CreatedAt,
@@ -106,6 +112,7 @@ const getTransactionDetailByTID = `-- name: GetTransactionDetailByTID :many
 SELECT  id::char(36),
         t_id::char(36),
         p_id::char(36),
+        pv_id::char(36),
         price::float,
         qty::integer,
         created_at::timestamp,
@@ -120,6 +127,7 @@ type GetTransactionDetailByTIDRow struct {
 	ID        string    `json:"id"`
 	TID       string    `json:"t_id"`
 	PID       string    `json:"p_id"`
+	PvID      string    `json:"pv_id"`
 	Price     float64   `json:"price"`
 	Qty       int32     `json:"qty"`
 	CreatedAt time.Time `json:"created_at"`
@@ -141,6 +149,7 @@ func (q *Queries) GetTransactionDetailByTID(ctx context.Context, tID string) ([]
 			&i.ID,
 			&i.TID,
 			&i.PID,
+			&i.PvID,
 			&i.Price,
 			&i.Qty,
 			&i.CreatedAt,
@@ -165,6 +174,7 @@ const getTransactionDetails = `-- name: GetTransactionDetails :many
 SELECT  id::char(36),
         t_id::char(36),
         p_id::char(36),
+        pv_id::char(36),
         price::float,
         qty::integer,
         created_at::timestamp,
@@ -178,6 +188,7 @@ type GetTransactionDetailsRow struct {
 	ID        string    `json:"id"`
 	TID       string    `json:"t_id"`
 	PID       string    `json:"p_id"`
+	PvID      string    `json:"pv_id"`
 	Price     float64   `json:"price"`
 	Qty       int32     `json:"qty"`
 	CreatedAt time.Time `json:"created_at"`
@@ -199,6 +210,7 @@ func (q *Queries) GetTransactionDetails(ctx context.Context) ([]GetTransactionDe
 			&i.ID,
 			&i.TID,
 			&i.PID,
+			&i.PvID,
 			&i.Price,
 			&i.Qty,
 			&i.CreatedAt,
@@ -223,14 +235,16 @@ const updateTransactionDetailByID = `-- name: UpdateTransactionDetailByID :one
 UPDATE transaction_details
 SET t_id = $1::char(36),
     p_id = $1::char(36),
-    price = $2::float,
-    qty = $3::integer,
+    pv_id= $2::char(36),
+    price = $3::float,
+    qty = $4::integer,
     updated_at = now() at time zone 'Asia/Jakarta',
-    updated_by = $4::varchar
-WHERE id = $5::char(36)
+    updated_by = $5::varchar
+WHERE id = $6::char(36)
     RETURNING id::char(36),
     t_id::char(36),
     p_id::char(36),
+    pv_id::char(36),
     price::float,
     qty::integer,
     created_at::timestamp,
@@ -241,6 +255,7 @@ WHERE id = $5::char(36)
 
 type UpdateTransactionDetailByIDParams struct {
 	TID       string  `json:"t_id"`
+	PvID      string  `json:"pv_id"`
 	Price     float64 `json:"price"`
 	Qty       int32   `json:"qty"`
 	UpdatedBy string  `json:"updated_by"`
@@ -251,6 +266,7 @@ type UpdateTransactionDetailByIDRow struct {
 	ID        string    `json:"id"`
 	TID       string    `json:"t_id"`
 	PID       string    `json:"p_id"`
+	PvID      string    `json:"pv_id"`
 	Price     float64   `json:"price"`
 	Qty       int32     `json:"qty"`
 	CreatedAt time.Time `json:"created_at"`
@@ -262,6 +278,7 @@ type UpdateTransactionDetailByIDRow struct {
 func (q *Queries) UpdateTransactionDetailByID(ctx context.Context, arg UpdateTransactionDetailByIDParams) (UpdateTransactionDetailByIDRow, error) {
 	row := q.db.QueryRowContext(ctx, updateTransactionDetailByID,
 		arg.TID,
+		arg.PvID,
 		arg.Price,
 		arg.Qty,
 		arg.UpdatedBy,
@@ -272,6 +289,7 @@ func (q *Queries) UpdateTransactionDetailByID(ctx context.Context, arg UpdateTra
 		&i.ID,
 		&i.TID,
 		&i.PID,
+		&i.PvID,
 		&i.Price,
 		&i.Qty,
 		&i.CreatedAt,

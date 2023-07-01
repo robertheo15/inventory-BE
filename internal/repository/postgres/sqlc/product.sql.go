@@ -11,12 +11,12 @@ import (
 )
 
 const createProduct = `-- name: CreateProduct :one
-INSERT INTO products (id, product_id, name, brand, description, stock, base_price,
-                      price_eceran, price_grosir, image, type, created_at, updated_at, created_by, updated_by)
+INSERT INTO products (id, product_id, name, brand, description, base_price,
+                      price_eceran, price_grosir, created_at, updated_at, created_by, updated_by)
 VALUES ((gen_random_uuid()::char(36)), $1::char(36), $2::varchar, $3::varchar,
-        $4::varchar, $5::integer, $6::float,
-        $7::float, $8::float, $9::varchar, $10::varchar,
-        now() at time zone 'Asia/Jakarta', now() at time zone 'Asia/Jakarta', $11::varchar, $12::varchar) returning id
+        $4::varchar, $5::float,
+        $6::float, $7::float,
+        now() at time zone 'Asia/Jakarta', now() at time zone 'Asia/Jakarta', $8::varchar, $9::varchar) returning id
 `
 
 type CreateProductParams struct {
@@ -24,12 +24,9 @@ type CreateProductParams struct {
 	Name        string  `json:"name"`
 	Brand       string  `json:"brand"`
 	Description string  `json:"description"`
-	Stock       int32   `json:"stock"`
 	BasePrice   float64 `json:"base_price"`
 	PriceEceran float64 `json:"price_eceran"`
 	PriceGrosir float64 `json:"price_grosir"`
-	Image       string  `json:"image"`
-	Type        string  `json:"type"`
 	CreatedBy   string  `json:"created_by"`
 	UpdatedBy   string  `json:"updated_by"`
 }
@@ -40,12 +37,9 @@ func (q *Queries) CreateProduct(ctx context.Context, arg CreateProductParams) (s
 		arg.Name,
 		arg.Brand,
 		arg.Description,
-		arg.Stock,
 		arg.BasePrice,
 		arg.PriceEceran,
 		arg.PriceGrosir,
-		arg.Image,
-		arg.Type,
 		arg.CreatedBy,
 		arg.UpdatedBy,
 	)
@@ -73,12 +67,9 @@ SELECT id::char(36),
         name::varchar,
         brand::varchar,
         description::varchar,
-        stock::integer,
         base_price::float,
         price_eceran::float,
         price_grosir::float,
-        image::varchar,
-        type::varchar,
         created_at::timestamp,
         updated_at::timestamp,
         created_by::varchar,
@@ -93,12 +84,9 @@ type GetProductByIDRow struct {
 	Name        string    `json:"name"`
 	Brand       string    `json:"brand"`
 	Description string    `json:"description"`
-	Stock       int32     `json:"stock"`
 	BasePrice   float64   `json:"base_price"`
 	PriceEceran float64   `json:"price_eceran"`
 	PriceGrosir float64   `json:"price_grosir"`
-	Image       string    `json:"image"`
-	Type        string    `json:"type"`
 	CreatedAt   time.Time `json:"created_at"`
 	UpdatedAt   time.Time `json:"updated_at"`
 	CreatedBy   string    `json:"created_by"`
@@ -114,12 +102,9 @@ func (q *Queries) GetProductByID(ctx context.Context, productid string) (GetProd
 		&i.Name,
 		&i.Brand,
 		&i.Description,
-		&i.Stock,
 		&i.BasePrice,
 		&i.PriceEceran,
 		&i.PriceGrosir,
-		&i.Image,
-		&i.Type,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 		&i.CreatedBy,
@@ -134,12 +119,9 @@ SELECT id::char(36),
     name::varchar,
     brand::varchar,
     description::varchar,
-    stock::integer,
     base_price::float,
     price_eceran::float,
     price_grosir::float,
-    image::varchar,
-    type::varchar,
     created_at::timestamp,
     updated_at::timestamp,
     created_by::varchar,
@@ -153,12 +135,9 @@ type GetProductsRow struct {
 	Name        string    `json:"name"`
 	Brand       string    `json:"brand"`
 	Description string    `json:"description"`
-	Stock       int32     `json:"stock"`
 	BasePrice   float64   `json:"base_price"`
 	PriceEceran float64   `json:"price_eceran"`
 	PriceGrosir float64   `json:"price_grosir"`
-	Image       string    `json:"image"`
-	Type        string    `json:"type"`
 	CreatedAt   time.Time `json:"created_at"`
 	UpdatedAt   time.Time `json:"updated_at"`
 	CreatedBy   string    `json:"created_by"`
@@ -180,12 +159,79 @@ func (q *Queries) GetProducts(ctx context.Context) ([]GetProductsRow, error) {
 			&i.Name,
 			&i.Brand,
 			&i.Description,
-			&i.Stock,
 			&i.BasePrice,
 			&i.PriceEceran,
 			&i.PriceGrosir,
-			&i.Image,
-			&i.Type,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.CreatedBy,
+			&i.UpdatedBy,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getProductsBySupplierID = `-- name: GetProductsBySupplierID :many
+SELECT id::char(36),
+        product_id::char(36),
+        s_id::char(36),
+        name::varchar,
+        brand::varchar,
+        description::varchar,
+        base_price::float,
+        price_eceran::float,
+        price_grosir::float,
+        created_at::timestamp,
+        updated_at::timestamp,
+        created_by::varchar,
+        updated_by::varchar
+FROM products where s_id = $1::char(36)
+`
+
+type GetProductsBySupplierIDRow struct {
+	ID          string    `json:"id"`
+	ProductID   string    `json:"product_id"`
+	SID         string    `json:"s_id"`
+	Name        string    `json:"name"`
+	Brand       string    `json:"brand"`
+	Description string    `json:"description"`
+	BasePrice   float64   `json:"base_price"`
+	PriceEceran float64   `json:"price_eceran"`
+	PriceGrosir float64   `json:"price_grosir"`
+	CreatedAt   time.Time `json:"created_at"`
+	UpdatedAt   time.Time `json:"updated_at"`
+	CreatedBy   string    `json:"created_by"`
+	UpdatedBy   string    `json:"updated_by"`
+}
+
+func (q *Queries) GetProductsBySupplierID(ctx context.Context, sID string) ([]GetProductsBySupplierIDRow, error) {
+	rows, err := q.db.QueryContext(ctx, getProductsBySupplierID, sID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetProductsBySupplierIDRow
+	for rows.Next() {
+		var i GetProductsBySupplierIDRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.ProductID,
+			&i.SID,
+			&i.Name,
+			&i.Brand,
+			&i.Description,
+			&i.BasePrice,
+			&i.PriceEceran,
+			&i.PriceGrosir,
 			&i.CreatedAt,
 			&i.UpdatedAt,
 			&i.CreatedBy,
@@ -210,17 +256,14 @@ SET name= $1:: varchar,
     product_id= $2:: varchar,
     brand= $3:: varchar,
     description = $4:: varchar,
-    stock= $5:: integer,
-    base_price = $6:: float,
-    price_eceran = $7:: float,
-    price_grosir = $8:: float,
-    image = $9:: varchar,
-    type = $10:: varchar,
+    base_price = $5:: float,
+    price_eceran = $6:: float,
+    price_grosir = $7:: float,
     updated_at = (now() at time zone 'Asia/Jakarta'):: timestamp,
-    updated_by = $11:: varchar
-WHERE id = $12:: char (36) returning id::char(36), product_id::char(36),
-    name:: varchar, brand::varchar, description::varchar, stock::integer, base_price::float, price_eceran::float, price_grosir::float
-    , image::varchar, type::varchar, created_at::timestamp, updated_at::timestamp, created_by::varchar, updated_by::varchar
+    updated_by = $8:: varchar
+WHERE id = $9:: char (36) returning id::char(36), product_id::char(36),
+    name:: varchar, brand::varchar, description::varchar, base_price::float, price_eceran::float, price_grosir::float
+    , created_at::timestamp, updated_at::timestamp, created_by::varchar, updated_by::varchar
 `
 
 type UpdateProductByIDParams struct {
@@ -228,12 +271,9 @@ type UpdateProductByIDParams struct {
 	ProductID   string  `json:"product_id"`
 	Brand       string  `json:"brand"`
 	Description string  `json:"description"`
-	Stock       int32   `json:"stock"`
 	Baseprice   float64 `json:"baseprice"`
 	Priceeceran float64 `json:"priceeceran"`
 	Pricegrosir float64 `json:"pricegrosir"`
-	Image       string  `json:"image"`
-	Type        string  `json:"type"`
 	Updatedby   string  `json:"updatedby"`
 	ID          string  `json:"id"`
 }
@@ -244,12 +284,9 @@ type UpdateProductByIDRow struct {
 	Name        string    `json:"name"`
 	Brand       string    `json:"brand"`
 	Description string    `json:"description"`
-	Stock       int32     `json:"stock"`
 	BasePrice   float64   `json:"base_price"`
 	PriceEceran float64   `json:"price_eceran"`
 	PriceGrosir float64   `json:"price_grosir"`
-	Image       string    `json:"image"`
-	Type        string    `json:"type"`
 	CreatedAt   time.Time `json:"created_at"`
 	UpdatedAt   time.Time `json:"updated_at"`
 	CreatedBy   string    `json:"created_by"`
@@ -262,12 +299,9 @@ func (q *Queries) UpdateProductByID(ctx context.Context, arg UpdateProductByIDPa
 		arg.ProductID,
 		arg.Brand,
 		arg.Description,
-		arg.Stock,
 		arg.Baseprice,
 		arg.Priceeceran,
 		arg.Pricegrosir,
-		arg.Image,
-		arg.Type,
 		arg.Updatedby,
 		arg.ID,
 	)
@@ -278,18 +312,34 @@ func (q *Queries) UpdateProductByID(ctx context.Context, arg UpdateProductByIDPa
 		&i.Name,
 		&i.Brand,
 		&i.Description,
-		&i.Stock,
 		&i.BasePrice,
 		&i.PriceEceran,
 		&i.PriceGrosir,
-		&i.Image,
-		&i.Type,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 		&i.CreatedBy,
 		&i.UpdatedBy,
 	)
 	return i, err
+}
+
+const updateProductStockByID = `-- name: UpdateProductStockByID :exec
+UPDATE products
+SET stock= $1:: integer,
+    updated_at = (now() at time zone 'Asia/Jakarta'):: timestamp,
+    updated_by = $2:: varchar
+WHERE id = $3:: char (36)
+`
+
+type UpdateProductStockByIDParams struct {
+	Stock     int32  `json:"stock"`
+	Updatedby string `json:"updatedby"`
+	ID        string `json:"id"`
+}
+
+func (q *Queries) UpdateProductStockByID(ctx context.Context, arg UpdateProductStockByIDParams) error {
+	_, err := q.db.ExecContext(ctx, updateProductStockByID, arg.Stock, arg.Updatedby, arg.ID)
+	return err
 }
 
 const updateProductStockChildByID = `-- name: UpdateProductStockChildByID :exec
@@ -308,24 +358,5 @@ type UpdateProductStockChildByIDParams struct {
 
 func (q *Queries) UpdateProductStockChildByID(ctx context.Context, arg UpdateProductStockChildByIDParams) error {
 	_, err := q.db.ExecContext(ctx, updateProductStockChildByID, arg.Stock, arg.Updatedby, arg.ProductID)
-	return err
-}
-
-const updateProductStockParentByID = `-- name: UpdateProductStockParentByID :exec
-UPDATE products
-SET stock= $1:: integer,
-    updated_at = (now() at time zone 'Asia/Jakarta'):: timestamp,
-    updated_by = $2:: varchar
-WHERE id = $3:: char (36)
-`
-
-type UpdateProductStockParentByIDParams struct {
-	Stock     int32  `json:"stock"`
-	Updatedby string `json:"updatedby"`
-	ID        string `json:"id"`
-}
-
-func (q *Queries) UpdateProductStockParentByID(ctx context.Context, arg UpdateProductStockParentByIDParams) error {
-	_, err := q.db.ExecContext(ctx, updateProductStockParentByID, arg.Stock, arg.Updatedby, arg.ID)
 	return err
 }

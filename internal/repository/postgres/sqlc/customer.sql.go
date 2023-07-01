@@ -61,6 +61,7 @@ SELECT  id::char(36),
         full_name::varchar,
         phone_number::varchar,
         address::varchar,
+        email::varchar,
         created_at::timestamp,
         updated_at::timestamp,
         created_by::varchar,
@@ -73,6 +74,7 @@ type GetCustomersRow struct {
 	FullName    string    `json:"full_name"`
 	PhoneNumber string    `json:"phone_number"`
 	Address     string    `json:"address"`
+	Email       string    `json:"email"`
 	CreatedAt   time.Time `json:"created_at"`
 	UpdatedAt   time.Time `json:"updated_at"`
 	CreatedBy   string    `json:"created_by"`
@@ -93,6 +95,7 @@ func (q *Queries) GetCustomers(ctx context.Context) ([]GetCustomersRow, error) {
 			&i.FullName,
 			&i.PhoneNumber,
 			&i.Address,
+			&i.Email,
 			&i.CreatedAt,
 			&i.UpdatedAt,
 			&i.CreatedBy,
@@ -116,6 +119,7 @@ SELECT  id::char(36),
         full_name::varchar,
         phone_number::varchar,
         address::varchar,
+        email::varchar,
         created_at::timestamp,
         updated_at::timestamp,
         created_by::varchar,
@@ -128,6 +132,7 @@ type GetCustomersByIDRow struct {
 	FullName    string    `json:"full_name"`
 	PhoneNumber string    `json:"phone_number"`
 	Address     string    `json:"address"`
+	Email       string    `json:"email"`
 	CreatedAt   time.Time `json:"created_at"`
 	UpdatedAt   time.Time `json:"updated_at"`
 	CreatedBy   string    `json:"created_by"`
@@ -142,6 +147,7 @@ func (q *Queries) GetCustomersByID(ctx context.Context, id string) (GetCustomers
 		&i.FullName,
 		&i.PhoneNumber,
 		&i.Address,
+		&i.Email,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 		&i.CreatedBy,
@@ -155,14 +161,16 @@ UPDATE customers
 SET full_name = $1::varchar,
     phone_number = $2::varchar,
     address = $3::varchar,
-    created_at = $4::timestamp,
+    email = $4::varchar,
+    created_at = $5::timestamp,
     updated_at = (now() at time zone 'Asia/Jakarta')::timestamp,
-    updated_by = $5::varchar
-WHERE   id = $6::char(36) RETURNING
+    updated_by = $6::varchar
+WHERE   id = $7::char(36) RETURNING
     id::char(36),
     full_name::varchar,
     phone_number::varchar,
     address::varchar,
+    email::varchar,
     created_at::timestamp,
     updated_at::timestamp,
     created_by::varchar,
@@ -173,6 +181,7 @@ type UpdateCustomerByIDParams struct {
 	FullName    string    `json:"full_name"`
 	PhoneNumber string    `json:"phone_number"`
 	Address     string    `json:"address"`
+	Email       string    `json:"email"`
 	CreatedAt   time.Time `json:"created_at"`
 	UpdatedBy   string    `json:"updated_by"`
 	ID          string    `json:"id"`
@@ -183,6 +192,7 @@ type UpdateCustomerByIDRow struct {
 	FullName    string    `json:"full_name"`
 	PhoneNumber string    `json:"phone_number"`
 	Address     string    `json:"address"`
+	Email       string    `json:"email"`
 	CreatedAt   time.Time `json:"created_at"`
 	UpdatedAt   time.Time `json:"updated_at"`
 	CreatedBy   string    `json:"created_by"`
@@ -194,6 +204,7 @@ func (q *Queries) UpdateCustomerByID(ctx context.Context, arg UpdateCustomerByID
 		arg.FullName,
 		arg.PhoneNumber,
 		arg.Address,
+		arg.Email,
 		arg.CreatedAt,
 		arg.UpdatedBy,
 		arg.ID,
@@ -204,6 +215,7 @@ func (q *Queries) UpdateCustomerByID(ctx context.Context, arg UpdateCustomerByID
 		&i.FullName,
 		&i.PhoneNumber,
 		&i.Address,
+		&i.Email,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 		&i.CreatedBy,

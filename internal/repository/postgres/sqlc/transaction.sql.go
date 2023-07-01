@@ -8,6 +8,8 @@ package sqlc
 import (
 	"context"
 	"time"
+
+	"github.com/lib/pq"
 )
 
 const createTransaction = `-- name: CreateTransaction :one
@@ -17,6 +19,7 @@ INSERT INTO transactions (id,
                           invoice,
                           status,
                           type,
+                          methode,
                           created_at,
                           updated_at,
                           created_by,
@@ -27,10 +30,11 @@ VALUES (gen_random_uuid(),
         $3::varchar,
         $4::varchar,
         $5::varchar,
-        now() at time zone 'Asia/Jakarta',
-        now() at time zone 'Asia/Jakarta',
         $6::varchar,
-        $7::varchar)
+        now() at time zone 'Asia/Jakarta',
+        now() at time zone 'Asia/Jakarta',
+        $7::varchar,
+        $8::varchar)
 RETURNING id::char(36), invoice::varchar
 `
 
@@ -40,8 +44,9 @@ type CreateTransactionParams struct {
 	Invoice       string `json:"invoice"`
 	Status        string `json:"status"`
 	Type          string `json:"type"`
+	Methode       string `json:"methode"`
 	CreatedBy     string `json:"created_by"`
-	UpdatedByy    string `json:"updated_byy"`
+	UpdatedBy     string `json:"updated_by"`
 }
 
 type CreateTransactionRow struct {
@@ -56,8 +61,9 @@ func (q *Queries) CreateTransaction(ctx context.Context, arg CreateTransactionPa
 		arg.Invoice,
 		arg.Status,
 		arg.Type,
+		arg.Methode,
 		arg.CreatedBy,
-		arg.UpdatedByy,
+		arg.UpdatedBy,
 	)
 	var i CreateTransactionRow
 	err := row.Scan(&i.ID, &i.Invoice)
@@ -85,6 +91,7 @@ SELECT
         invoice::varchar,
         status::varchar,
         type::varchar,
+        methode::varchar,
         created_at::timestamp,
         updated_at::timestamp,
         created_by::varchar,
@@ -99,6 +106,7 @@ type GetTransactionByChildIDRow struct {
 	Invoice       string    `json:"invoice"`
 	Status        string    `json:"status"`
 	Type          string    `json:"type"`
+	Methode       string    `json:"methode"`
 	CreatedAt     time.Time `json:"created_at"`
 	UpdatedAt     time.Time `json:"updated_at"`
 	CreatedBy     string    `json:"created_by"`
@@ -121,6 +129,7 @@ func (q *Queries) GetTransactionByChildID(ctx context.Context, transactionID str
 			&i.Invoice,
 			&i.Status,
 			&i.Type,
+			&i.Methode,
 			&i.CreatedAt,
 			&i.UpdatedAt,
 			&i.CreatedBy,
@@ -147,12 +156,18 @@ SELECT
     invoice::varchar,
     status::varchar,
     type::varchar,
+    methode::varchar,
     created_at::timestamp,
     updated_at::timestamp,
     created_by::varchar,
     updated_by::varchar
-FROM transactions WHERE id = $1::char(36)
+FROM transactions WHERE id = $2::char(36) and type = ANY($1::varchar[])
 `
+
+type GetTransactionByIDParams struct {
+	Column1 []string `json:"column_1"`
+	ID      string   `json:"id"`
+}
 
 type GetTransactionByIDRow struct {
 	ID            string    `json:"id"`
@@ -161,14 +176,15 @@ type GetTransactionByIDRow struct {
 	Invoice       string    `json:"invoice"`
 	Status        string    `json:"status"`
 	Type          string    `json:"type"`
+	Methode       string    `json:"methode"`
 	CreatedAt     time.Time `json:"created_at"`
 	UpdatedAt     time.Time `json:"updated_at"`
 	CreatedBy     string    `json:"created_by"`
 	UpdatedBy     string    `json:"updated_by"`
 }
 
-func (q *Queries) GetTransactionByID(ctx context.Context, id string) (GetTransactionByIDRow, error) {
-	row := q.db.QueryRowContext(ctx, getTransactionByID, id)
+func (q *Queries) GetTransactionByID(ctx context.Context, arg GetTransactionByIDParams) (GetTransactionByIDRow, error) {
+	row := q.db.QueryRowContext(ctx, getTransactionByID, pq.Array(arg.Column1), arg.ID)
 	var i GetTransactionByIDRow
 	err := row.Scan(
 		&i.ID,
@@ -177,6 +193,7 @@ func (q *Queries) GetTransactionByID(ctx context.Context, id string) (GetTransac
 		&i.Invoice,
 		&i.Status,
 		&i.Type,
+		&i.Methode,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 		&i.CreatedBy,
@@ -192,11 +209,12 @@ SELECT id::char(36),
        invoice::varchar,
        status::varchar,
        type::varchar,
+       methode::varchar,
        created_at::timestamp,
        updated_at::timestamp,
        created_by::varchar,
        updated_by::varchar
-FROM transactions
+FROM transactions WHERE type = ANY($1::varchar[])
 `
 
 type GetTransactionsRow struct {
@@ -206,14 +224,15 @@ type GetTransactionsRow struct {
 	Invoice       string    `json:"invoice"`
 	Status        string    `json:"status"`
 	Type          string    `json:"type"`
+	Methode       string    `json:"methode"`
 	CreatedAt     time.Time `json:"created_at"`
 	UpdatedAt     time.Time `json:"updated_at"`
 	CreatedBy     string    `json:"created_by"`
 	UpdatedBy     string    `json:"updated_by"`
 }
 
-func (q *Queries) GetTransactions(ctx context.Context) ([]GetTransactionsRow, error) {
-	rows, err := q.db.QueryContext(ctx, getTransactions)
+func (q *Queries) GetTransactions(ctx context.Context, dollar_1 []string) ([]GetTransactionsRow, error) {
+	rows, err := q.db.QueryContext(ctx, getTransactions, pq.Array(dollar_1))
 	if err != nil {
 		return nil, err
 	}
@@ -228,6 +247,7 @@ func (q *Queries) GetTransactions(ctx context.Context) ([]GetTransactionsRow, er
 			&i.Invoice,
 			&i.Status,
 			&i.Type,
+			&i.Methode,
 			&i.CreatedAt,
 			&i.UpdatedAt,
 			&i.CreatedBy,
@@ -246,14 +266,181 @@ func (q *Queries) GetTransactions(ctx context.Context) ([]GetTransactionsRow, er
 	return items, nil
 }
 
+const getTransactionsByStatus = `-- name: GetTransactionsByStatus :many
+SELECT  id::char(36),
+        c_id::char(36),
+        transaction_id::char(36),
+        invoice::varchar,
+        status::varchar,
+        type::varchar,
+        methode::varchar,
+        created_at::timestamp,
+        updated_at::timestamp,
+        created_by::varchar,
+        updated_by::varchar
+FROM transactions WHERE type = ANY($1::varchar[]) and status = $2::varchar
+ORDER BY created_at ASC
+`
+
+type GetTransactionsByStatusParams struct {
+	Column1 []string `json:"column_1"`
+	Status  string   `json:"status"`
+}
+
+type GetTransactionsByStatusRow struct {
+	ID            string    `json:"id"`
+	CID           string    `json:"c_id"`
+	TransactionID string    `json:"transaction_id"`
+	Invoice       string    `json:"invoice"`
+	Status        string    `json:"status"`
+	Type          string    `json:"type"`
+	Methode       string    `json:"methode"`
+	CreatedAt     time.Time `json:"created_at"`
+	UpdatedAt     time.Time `json:"updated_at"`
+	CreatedBy     string    `json:"created_by"`
+	UpdatedBy     string    `json:"updated_by"`
+}
+
+func (q *Queries) GetTransactionsByStatus(ctx context.Context, arg GetTransactionsByStatusParams) ([]GetTransactionsByStatusRow, error) {
+	rows, err := q.db.QueryContext(ctx, getTransactionsByStatus, pq.Array(arg.Column1), arg.Status)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetTransactionsByStatusRow
+	for rows.Next() {
+		var i GetTransactionsByStatusRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.CID,
+			&i.TransactionID,
+			&i.Invoice,
+			&i.Status,
+			&i.Type,
+			&i.Methode,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.CreatedBy,
+			&i.UpdatedBy,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getTransactionsSupplierByStatus = `-- name: GetTransactionsSupplierByStatus :many
+SELECT  t.id::char(36),
+        t.c_id::char(36),
+        t.transaction_id::char(36),
+        t.invoice::varchar,
+        t.status::varchar,
+        t.type::varchar,
+        t.methode::varchar,
+        s.brand_name::varchar,
+        t.created_at::timestamp,
+        t.updated_at::timestamp,
+        t.created_by::varchar,
+        t.updated_by::varchar
+FROM transactions t
+     INNER JOIN suppliers s on t.s_id = s.id
+WHERE t.type = ANY($1::varchar[]) and t.status = $2::varchar
+ORDER BY created_at ASC
+`
+
+type GetTransactionsSupplierByStatusParams struct {
+	Column1 []string `json:"column_1"`
+	Status  string   `json:"status"`
+}
+
+type GetTransactionsSupplierByStatusRow struct {
+	TID            string    `json:"t_id"`
+	TCID           string    `json:"t_c_id"`
+	TTransactionID string    `json:"t_transaction_id"`
+	TInvoice       string    `json:"t_invoice"`
+	TStatus        string    `json:"t_status"`
+	TType          string    `json:"t_type"`
+	TMethode       string    `json:"t_methode"`
+	SBrandName     string    `json:"s_brand_name"`
+	TCreatedAt     time.Time `json:"t_created_at"`
+	TUpdatedAt     time.Time `json:"t_updated_at"`
+	TCreatedBy     string    `json:"t_created_by"`
+	TUpdatedBy     string    `json:"t_updated_by"`
+}
+
+func (q *Queries) GetTransactionsSupplierByStatus(ctx context.Context, arg GetTransactionsSupplierByStatusParams) ([]GetTransactionsSupplierByStatusRow, error) {
+	rows, err := q.db.QueryContext(ctx, getTransactionsSupplierByStatus, pq.Array(arg.Column1), arg.Status)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetTransactionsSupplierByStatusRow
+	for rows.Next() {
+		var i GetTransactionsSupplierByStatusRow
+		if err := rows.Scan(
+			&i.TID,
+			&i.TCID,
+			&i.TTransactionID,
+			&i.TInvoice,
+			&i.TStatus,
+			&i.TType,
+			&i.TMethode,
+			&i.SBrandName,
+			&i.TCreatedAt,
+			&i.TUpdatedAt,
+			&i.TCreatedBy,
+			&i.TUpdatedBy,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const updateStatusTransactionByID = `-- name: UpdateStatusTransactionByID :one
+UPDATE transactions
+SET status = $1::varchar,
+    updated_at = (now() at time zone 'Asia/Jakarta')::timestamp,
+    updated_by = $2::varchar
+WHERE id = $3::char(36) RETURNING
+    id::char(36)
+`
+
+type UpdateStatusTransactionByIDParams struct {
+	Status    string `json:"status"`
+	UpdatedBy string `json:"updated_by"`
+	ID        string `json:"id"`
+}
+
+func (q *Queries) UpdateStatusTransactionByID(ctx context.Context, arg UpdateStatusTransactionByIDParams) (string, error) {
+	row := q.db.QueryRowContext(ctx, updateStatusTransactionByID, arg.Status, arg.UpdatedBy, arg.ID)
+	var id string
+	err := row.Scan(&id)
+	return id, err
+}
+
 const updateTransactionByID = `-- name: UpdateTransactionByID :one
 UPDATE transactions
 SET c_id = $1::char(36),
     transaction_id = $2::char(36),
     status = $3::varchar,
     type = $4::varchar,
+    methode = $5::varchar,
     updated_at = (now() at time zone 'Asia/Jakarta')::timestamp,
-    created_by = $5::varchar,
     updated_by = $6::varchar
 WHERE id = $7::char(36) RETURNING
     id::char(36),
@@ -262,6 +449,7 @@ WHERE id = $7::char(36) RETURNING
     invoice::varchar,
     status::varchar,
     type::varchar,
+    methode::varchar,
     created_at::timestamp,
     updated_at::timestamp,
     created_by::varchar,
@@ -273,7 +461,7 @@ type UpdateTransactionByIDParams struct {
 	TransactionID string `json:"transaction_id"`
 	Status        string `json:"status"`
 	Type          string `json:"type"`
-	CreatedBy     string `json:"created_by"`
+	Methode       string `json:"methode"`
 	UpdatedBy     string `json:"updated_by"`
 	ID            string `json:"id"`
 }
@@ -285,6 +473,7 @@ type UpdateTransactionByIDRow struct {
 	Invoice       string    `json:"invoice"`
 	Status        string    `json:"status"`
 	Type          string    `json:"type"`
+	Methode       string    `json:"methode"`
 	CreatedAt     time.Time `json:"created_at"`
 	UpdatedAt     time.Time `json:"updated_at"`
 	CreatedBy     string    `json:"created_by"`
@@ -297,7 +486,7 @@ func (q *Queries) UpdateTransactionByID(ctx context.Context, arg UpdateTransacti
 		arg.TransactionID,
 		arg.Status,
 		arg.Type,
-		arg.CreatedBy,
+		arg.Methode,
 		arg.UpdatedBy,
 		arg.ID,
 	)
@@ -309,6 +498,7 @@ func (q *Queries) UpdateTransactionByID(ctx context.Context, arg UpdateTransacti
 		&i.Invoice,
 		&i.Status,
 		&i.Type,
+		&i.Methode,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 		&i.CreatedBy,

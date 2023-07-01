@@ -11,17 +11,22 @@ import (
 )
 
 const createProductVariant = `-- name: CreateProductVariant :one
-INSERT INTO product_variants (id, p_id, name, colour,
+INSERT INTO product_variants (id, p_id, pv_id, name, colour, stock, location, type,
                              created_at, updated_at, created_by, updated_by)
-VALUES (gen_random_uuid(), $1::char(36), $2::varchar, $3::varchar,
-        now() at time zone 'Asia/Jakarta', now() at time zone 'Asia/Jakarta', $4::varchar, $5::varchar)
+VALUES (gen_random_uuid(), $1::char(36), $2::char(36), $3::varchar, $4::varchar, $5::integer, $6::varchar,
+        $7::varchar,
+        now() at time zone 'Asia/Jakarta', now() at time zone 'Asia/Jakarta', $8::varchar, $9::varchar)
 RETURNING id::char(36)
 `
 
 type CreateProductVariantParams struct {
 	PID       string `json:"p_id"`
+	PvID      string `json:"pv_id"`
 	Name      string `json:"name"`
 	Colour    string `json:"colour"`
+	Stock     int32  `json:"stock"`
+	Location  string `json:"location"`
+	Type      string `json:"type"`
 	CreatedBy string `json:"created_by"`
 	UpdatedBy string `json:"updated_by"`
 }
@@ -29,8 +34,12 @@ type CreateProductVariantParams struct {
 func (q *Queries) CreateProductVariant(ctx context.Context, arg CreateProductVariantParams) (string, error) {
 	row := q.db.QueryRowContext(ctx, createProductVariant,
 		arg.PID,
+		arg.PvID,
 		arg.Name,
 		arg.Colour,
+		arg.Stock,
+		arg.Location,
+		arg.Type,
 		arg.CreatedBy,
 		arg.UpdatedBy,
 	)
@@ -55,8 +64,12 @@ func (q *Queries) DeleteProductVariantByID(ctx context.Context, id string) (stri
 const getProductVariantByID = `-- name: GetProductVariantByID :one
 SELECT id:: char(36),
         p_id::char(36),
+        pv_id::char(36),
         name::varchar,
         colour::varchar,
+        stock::integer,
+        location::varchar,
+        type::varchar,
         created_at::timestamp,
         updated_at::timestamp,
         created_by::varchar,
@@ -68,8 +81,12 @@ WHERE id = $1::char(36)
 type GetProductVariantByIDRow struct {
 	ID        string    `json:"id"`
 	PID       string    `json:"p_id"`
+	PvID      string    `json:"pv_id"`
 	Name      string    `json:"name"`
 	Colour    string    `json:"colour"`
+	Stock     int32     `json:"stock"`
+	Location  string    `json:"location"`
+	Type      string    `json:"type"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
 	CreatedBy string    `json:"created_by"`
@@ -82,8 +99,12 @@ func (q *Queries) GetProductVariantByID(ctx context.Context, id string) (GetProd
 	err := row.Scan(
 		&i.ID,
 		&i.PID,
+		&i.PvID,
 		&i.Name,
 		&i.Colour,
+		&i.Stock,
+		&i.Location,
+		&i.Type,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 		&i.CreatedBy,
@@ -93,26 +114,40 @@ func (q *Queries) GetProductVariantByID(ctx context.Context, id string) (GetProd
 }
 
 const getProductVariants = `-- name: GetProductVariants :many
-SELECT id:: char(36),
-        p_id::char(36),
-        name::varchar,
-        colour::varchar,
-        created_at::timestamp,
-        updated_at::timestamp,
-        created_by::varchar,
-        updated_by::varchar
-FROM product_variants
+SELECT pv.id::char(36),
+       pv.pv_id::char(36),
+       p.id::char(36),
+       p.name::varchar,
+       pv.name::varchar,
+       p.brand::varchar,
+       pv.colour::varchar,
+       pv.stock::integer,
+       pv.location::varchar,
+       pv.type::varchar,
+       pv.created_at::timestamp,
+       pv.updated_at::timestamp,
+       pv.created_by::varchar,
+       pv.updated_by::varchar
+FROM  product_variants as pv
+        INNER JOIN products p ON pv.p_id = p.id
+ORDER BY pv.name ASC
 `
 
 type GetProductVariantsRow struct {
-	ID        string    `json:"id"`
-	PID       string    `json:"p_id"`
-	Name      string    `json:"name"`
-	Colour    string    `json:"colour"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
-	CreatedBy string    `json:"created_by"`
-	UpdatedBy string    `json:"updated_by"`
+	PvID        string    `json:"pv_id"`
+	PvPvID      string    `json:"pv_pv_id"`
+	PID         string    `json:"p_id"`
+	PName       string    `json:"p_name"`
+	PvName      string    `json:"pv_name"`
+	PBrand      string    `json:"p_brand"`
+	PvColour    string    `json:"pv_colour"`
+	PvStock     int32     `json:"pv_stock"`
+	PvLocation  string    `json:"pv_location"`
+	PvType      string    `json:"pv_type"`
+	PvCreatedAt time.Time `json:"pv_created_at"`
+	PvUpdatedAt time.Time `json:"pv_updated_at"`
+	PvCreatedBy string    `json:"pv_created_by"`
+	PvUpdatedBy string    `json:"pv_updated_by"`
 }
 
 func (q *Queries) GetProductVariants(ctx context.Context) ([]GetProductVariantsRow, error) {
@@ -125,14 +160,20 @@ func (q *Queries) GetProductVariants(ctx context.Context) ([]GetProductVariantsR
 	for rows.Next() {
 		var i GetProductVariantsRow
 		if err := rows.Scan(
-			&i.ID,
+			&i.PvID,
+			&i.PvPvID,
 			&i.PID,
-			&i.Name,
-			&i.Colour,
-			&i.CreatedAt,
-			&i.UpdatedAt,
-			&i.CreatedBy,
-			&i.UpdatedBy,
+			&i.PName,
+			&i.PvName,
+			&i.PBrand,
+			&i.PvColour,
+			&i.PvStock,
+			&i.PvLocation,
+			&i.PvType,
+			&i.PvCreatedAt,
+			&i.PvUpdatedAt,
+			&i.PvCreatedBy,
+			&i.PvUpdatedBy,
 		); err != nil {
 			return nil, err
 		}
@@ -150,20 +191,28 @@ func (q *Queries) GetProductVariants(ctx context.Context) ([]GetProductVariantsR
 const getProductVariantsByProductID = `-- name: GetProductVariantsByProductID :many
 SELECT id:: char(36),
         p_id::char(36),
+        pv_id::char(36),
         name::varchar,
         colour::varchar,
+        stock::integer,
+        location::varchar,
+        type::varchar,
         created_at::timestamp,
         updated_at::timestamp,
         created_by::varchar,
         updated_by::varchar
-FROM product_variants WHERE p_id = $1::char(36)
+FROM product_variants WHERE p_id = $1::char(36) and location = 'gudang'
 `
 
 type GetProductVariantsByProductIDRow struct {
 	ID        string    `json:"id"`
 	PID       string    `json:"p_id"`
+	PvID      string    `json:"pv_id"`
 	Name      string    `json:"name"`
 	Colour    string    `json:"colour"`
+	Stock     int32     `json:"stock"`
+	Location  string    `json:"location"`
+	Type      string    `json:"type"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
 	CreatedBy string    `json:"created_by"`
@@ -182,8 +231,12 @@ func (q *Queries) GetProductVariantsByProductID(ctx context.Context, productID s
 		if err := rows.Scan(
 			&i.ID,
 			&i.PID,
+			&i.PvID,
 			&i.Name,
 			&i.Colour,
+			&i.Stock,
+			&i.Location,
+			&i.Type,
 			&i.CreatedAt,
 			&i.UpdatedAt,
 			&i.CreatedBy,
@@ -207,10 +260,11 @@ UPDATE product_variants SET
         p_id= $1::char(36),
         name= $2::varchar,
         colour= $3::varchar,
-        updated_at= $4::timestamp,
-        created_by= $5::varchar,
-        updated_by= $6::varchar
-WHERE id = $7::char(36) RETURNING id::char(36), p_id::char(36), name::varchar, colour::varchar,
+        stock = $4::integer,
+        updated_at= $5::timestamp,
+        created_by= $6::varchar,
+        updated_by= $7::varchar
+WHERE id = $8::char(36) RETURNING id::char(36), p_id::char(36), name::varchar, colour::varchar, stock::integer, location::varchar,
     created_at::timestamp, updated_at::timestamp, created_by::varchar, updated_by::varchar
 `
 
@@ -218,6 +272,7 @@ type UpdateProductVariantByIDParams struct {
 	PID       string    `json:"p_id"`
 	Name      string    `json:"name"`
 	Colour    string    `json:"colour"`
+	Stock     int32     `json:"stock"`
 	UpdatedAt time.Time `json:"updated_at"`
 	CreatedBy string    `json:"created_by"`
 	UpdatedBy string    `json:"updated_by"`
@@ -229,6 +284,8 @@ type UpdateProductVariantByIDRow struct {
 	PID       string    `json:"p_id"`
 	Name      string    `json:"name"`
 	Colour    string    `json:"colour"`
+	Stock     int32     `json:"stock"`
+	Location  string    `json:"location"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
 	CreatedBy string    `json:"created_by"`
@@ -240,6 +297,7 @@ func (q *Queries) UpdateProductVariantByID(ctx context.Context, arg UpdateProduc
 		arg.PID,
 		arg.Name,
 		arg.Colour,
+		arg.Stock,
 		arg.UpdatedAt,
 		arg.CreatedBy,
 		arg.UpdatedBy,
@@ -251,10 +309,33 @@ func (q *Queries) UpdateProductVariantByID(ctx context.Context, arg UpdateProduc
 		&i.PID,
 		&i.Name,
 		&i.Colour,
+		&i.Stock,
+		&i.Location,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 		&i.CreatedBy,
 		&i.UpdatedBy,
 	)
 	return i, err
+}
+
+const updateProductVariantStockByID = `-- name: UpdateProductVariantStockByID :one
+UPDATE product_variants
+SET stock= $1::integer,
+    updated_at = (now() at time zone 'Asia/Jakarta')::timestamp,
+    updated_by = $2:: varchar
+WHERE id = $3::char(36) returning id::char(36)
+`
+
+type UpdateProductVariantStockByIDParams struct {
+	Stock     int32  `json:"stock"`
+	Updatedby string `json:"updatedby"`
+	ID        string `json:"id"`
+}
+
+func (q *Queries) UpdateProductVariantStockByID(ctx context.Context, arg UpdateProductVariantStockByIDParams) (string, error) {
+	row := q.db.QueryRowContext(ctx, updateProductVariantStockByID, arg.Stock, arg.Updatedby, arg.ID)
+	var id string
+	err := row.Scan(&id)
+	return id, err
 }
