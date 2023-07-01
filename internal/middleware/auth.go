@@ -46,6 +46,10 @@ func Auth() gin.HandlerFunc {
 
 		ctx.Set("id", data["id"])
 		ctx.Set("email", data["email"])
+		ctx.Set("full_name", data["full_name"])
+		ctx.Set("phone_number", data["phone_number"])
+		ctx.Set("role", data["role"])
+		ctx.Set("active", data["active"])
 		ctx.Next()
 	}
 }
