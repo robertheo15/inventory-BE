@@ -33,6 +33,15 @@ func (s *Service) GetProductByID(ctx *gin.Context, id string) (*models.Product, 
 	return product, nil
 }
 
+func (s *Service) GetProductBySupplierID(ctx *gin.Context, id string) ([]*models.Product, error) {
+	products, err := s.inventoryRepo.GetProductsBySupplierID(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+
+	return products, nil
+}
+
 func (s *Service) UpdateProductByID(ctx *gin.Context, newProduct *models.Product) (*models.Product, error) {
 	product, err := s.inventoryRepo.UpdateProductByID(ctx, newProduct)
 	if err != nil {
