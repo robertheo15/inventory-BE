@@ -2,6 +2,7 @@ package ginhttp
 
 import (
 	"context"
+	"inventory-app-be/internal/middleware"
 	"inventory-app-be/internal/service"
 
 	"github.com/gin-gonic/gin"
@@ -21,17 +22,23 @@ func NewServer(router *gin.Engine, service *service.Service) *Server {
 }
 
 func (s *Server) Run(ctx context.Context) {
+	s.router.Use(middleware.CORSMiddleware())
+
+	// s.router.POST("/forget-password", s.login)
+	// s.router.POST("/reset-password", s.login)
 	s.router.POST("/login", s.login)
 
-	// s.router.Use(middleware.Auth())
-	//{
-	// s.router.PUT("/users/:userID", s.createUser)
+	s.router.Use(middleware.Auth())
 
-	//}
-	s.router.POST("/users", s.createUser)
-	s.router.GET("/users/details", s.getUserDetailByToken)
-	s.router.PUT("/users/:userID", s.updateUserByID)
-	s.router.DELETE("/users/:userID", s.deleteUserByID)
+	userGroup := s.router.Group("/users")
+	{
+		userGroup.POST("/", s.createUser)
+		// userGroup.PUT("/profile", s.createUser)
+		userGroup.POST("/change-password", s.updateUserPasswordByID)
+		userGroup.GET("/details", s.getUserDetailByToken)
+		userGroup.PUT("/:userID", s.updateUserByID)
+		userGroup.DELETE("/:userID", s.deleteUserByID)
+	}
 
 	// customers
 	s.router.POST("/customers", s.createCustomer)
@@ -40,12 +47,24 @@ func (s *Server) Run(ctx context.Context) {
 	s.router.PUT("/customers/:customerID", s.updateCustomerByID)
 	s.router.DELETE("/customers/:customerID", s.deleteCustomerByID)
 
-	// customers
+	// transactions customer
 	s.router.POST("/transactions", s.createTransaction)
 	s.router.GET("/transactions", s.getTransactions)
+	s.router.POST("/transactions/status", s.getTransactionCustomersByStatus)
+	s.router.POST("/transactions/sends/:transactionID", s.updateStatusTransactionCustomerSedangDikirimByID)
+	s.router.POST("/transactions/finish/:transactionID", s.updateStatusTransactionCustomerSelesaiByID)
 	s.router.GET("/transactions/:transactionID", s.getTransactionByID)
 	s.router.PUT("/transactions/:transactionID", s.updateTransactionByID)
 	s.router.DELETE("/transactions/:transactionID", s.deleteTransactionByID)
+
+	// transactions supplier
+	s.router.POST("/transactions/suppliers", s.createTransactionSupplier)
+	s.router.GET("/transactions/suppliers", s.getTransactionSuppliers)
+	s.router.POST("/transactions/suppliers/status", s.getTransactionSupplierByStatus)
+	s.router.POST("/transactions/suppliers/:transactionID", s.updateStatusTransactionByIDAndUpdateStock)
+	// s.router.GET("/transactions/:transactionID", s.getTransactionByID)
+	//s.router.PUT("/transactions/:transactionID", s.updateTransactionByID)
+	//s.router.DELETE("/transactions/:transactionID", s.deleteTransactionByID)
 
 	// suppliers
 	s.router.POST("/suppliers", s.createSupplier)
@@ -56,6 +75,7 @@ func (s *Server) Run(ctx context.Context) {
 
 	// products
 	s.router.GET("/products", s.getProducts)
+	s.router.GET("/products/suppliers/:supplierID", s.getProductBySupplierID)
 	s.router.POST("/products", s.createProduct)
 	s.router.GET("/products/:productID", s.getProductByID)
 	s.router.PUT("/products/:productID", s.updateProductByID)
