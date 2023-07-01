@@ -3,14 +3,13 @@ package config
 import (
 	"database/sql"
 	"log"
-	"os"
 
 	_ "github.com/lib/pq"
 )
 
 func LoadDB() *sql.DB {
-	// db, err := gorm.Open(postgres.Open(os.Getenv("DB_CONFIG_LOCAL")), &gorm.Config{})
-	db, err := sql.Open("postgres", os.Getenv("DB_CONFIG_LOCAL"))
+	// db, err := sql.Open("postgres", os.Getenv("DB_CONFIG_LOCAL"))
+	db, err := sql.Open("postgres", "postgres://postgres:postgres@127.0.0.1/kreasitex-jakarta?sslmode=disable")
 	if err != nil {
 		log.Fatal("Error connecting database")
 	}
